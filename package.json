@@ -1,0 +1,29 @@
+{
+  "name": "falling-sand",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "format": "biome check --apply-unsafe . && eslint --fix . package.json",
+    "format:check": "biome check . && eslint . package.json",
+    "pre-commit": "bun format && bun test && git add -A",
+    "prepare": "bunx husky",
+    "preview": "vite preview"
+  },
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.7.3",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "eslint-config-gev": "^4.5.1",
+    "husky": "^9.0.11",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}
