@@ -1,5 +1,6 @@
 import { LinkedList } from "../main/linkedList.ts"
 import type { Particle } from "./Particle.ts"
+import type { Pos2D } from "./Pos.ts"
 
 export const width = 300
 export const height = 200
@@ -7,7 +8,19 @@ export const cellSize = 3
 export const maxParticles = 5000
 export const particles: LinkedList<Particle> = new LinkedList()
 
-export const drawOrders: Array<() => void> = []
+type DrawOrder = { pos: Pos2D; draw: boolean }
+
+export const drawOrders: Array<DrawOrder> = new Array(width * height).fill(
+  undefined,
+) as Array<DrawOrder>
+export let drawOrderI = 0
+
+export const addToDrawOrder = (order: DrawOrder) => {
+  drawOrders[drawOrderI++] = order
+}
+export const resetDrawOrder = () => {
+  drawOrderI = 0
+}
 
 export let canvas: CanvasRenderingContext2D =
   undefined as unknown as CanvasRenderingContext2D

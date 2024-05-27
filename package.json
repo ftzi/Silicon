@@ -8,7 +8,8 @@
     "format:check": "biome check . && eslint . package.json",
     "pre-commit": "bun format && bun test && git add -A",
     "prepare": "bunx husky",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tsw": "tsc --watch --noEmit"
   },
   "private": true,
   "type": "module",

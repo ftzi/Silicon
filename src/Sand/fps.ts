@@ -1,7 +1,7 @@
 import { canvas, width } from "./consts.tsx"
 
-const maxFps = 400
-const maxHistorySize = 60
+// const maxFps = 400
+const maxHistorySize = 20
 
 let lastFrameTime = performance.now()
 const fpsHistory = new Array(maxHistorySize).fill(0) as Array<number>
@@ -41,13 +41,13 @@ export const drawFps = () => {
 }
 
 // Also updates lastRenderTime
-const targetFrameDuration = 1000 / maxFps
+// const targetFrameDuration = 1000 / maxFps
 
 export const shouldLoop = (): boolean => {
   const now = performance.now()
   const timeSinceLastRender = now - lastRenderTime
 
-  if (timeSinceLastRender >= 2) {
+  if (timeSinceLastRender >= 0) {
     lastRenderTime = now
 
     return true

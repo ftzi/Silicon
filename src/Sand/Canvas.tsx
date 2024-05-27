@@ -1,9 +1,16 @@
 import React, { useEffect, useRef } from "react"
-import { Particle, Type } from "./Particle.ts"
+import { Particle, Types } from "./Particle.ts"
 import { update } from "./Particle.ts"
-import { Pos } from "./Pos.ts"
-import { Sand } from "./Sand.ts"
-import { canvas, cellSize, height, setCanvas, width } from "./consts.tsx"
+import { Sand, particleAt } from "./Sand.ts"
+import {
+  canvas,
+  cellSize,
+  drawOrderI,
+  height,
+  resetDrawOrder,
+  setCanvas,
+  width,
+} from "./consts.tsx"
 import { drawOrders } from "./consts.tsx"
 import { drawFps, shouldLoop, updateFps } from "./fps.ts"
 import { actionWhenMouseDown, drawMousePosition, setupMouse } from "./mouse.ts"
@@ -19,11 +26,11 @@ const addParticles = () => {
   for (let i = 0; i < 5000; i++) {
     Sand.addParticle(
       new Particle({
-        pos: new Pos({
+        pos: {
           x: Math.floor(Math.random() * width),
           y: Math.floor(Math.random() * height),
-        }),
-        type: Type.Sand,
+        },
+        type: Types.Sand,
       }),
     )
   }
@@ -38,8 +45,13 @@ const init = () => {
 }
 
 const draw = () => {
-  drawOrders.forEach((fn) => fn())
-  drawOrders.length = 0
+  for (let i = 0; i < drawOrderI; i++) {
+    const order = drawOrders[i]
+
+    if (order.draw) particleAt(order.pos)?.draw()
+    else canvas.clearRect(order.pos.x, order.pos.y, 1, 1)
+  }
+  resetDrawOrder()
   drawFps()
   drawMousePosition()
 }

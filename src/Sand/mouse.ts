@@ -1,5 +1,5 @@
-import { Particle, Type } from "./Particle.ts"
-import { Pos, type Pos2D, addPos } from "./Pos.ts"
+import { Particle, Types } from "./Particle.ts"
+import { type Pos2D, addPos } from "./Pos.ts"
 import { Sand } from "./Sand.ts"
 import { canvasElement, cellSize } from "./consts.tsx"
 
@@ -27,12 +27,15 @@ export const actionWhenMouseDown = () => {
   if (isMouseDown) {
     for (let x = 0; x < brushSize; x++) {
       for (let y = 0; y < brushSize; y++) {
-        const pos = addPos(mousePos, { x, y })
+        const pos = addPos(mousePos, {
+          x: x - Math.floor(brushSize / 2),
+          y: y - Math.floor(brushSize / 2),
+        })
 
         Sand.addParticle(
           new Particle({
-            pos: new Pos(pos),
-            type: Type.Sand,
+            pos,
+            type: Types.Sand,
           }),
         )
       }

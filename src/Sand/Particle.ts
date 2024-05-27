@@ -1,60 +1,69 @@
-import { random } from "colord"
-import { Pos, type Pos2D, addPos } from "./Pos.ts"
-import { Sand } from "./Sand.ts"
+import { type Pos2D, addPos } from "./Pos.ts"
+import { Sand, list, particleAt } from "./Sand.ts"
 import { canvas, height, width } from "./consts.tsx"
-import { drawOrders } from "./consts.tsx"
 
-export enum Type {
-  Sand = 0,
+export type Type = {
+  color: string
 }
 
+export const Types = {
+  Sand: {
+    color: "tan",
+  },
+} satisfies Record<string, Type>
+
 export class Particle {
-  public pos: Pos
+  public pos: Pos2D
+  // public x: number
+  // public y: number
   public type: Type
-  public color: string
+  public seed: number = Math.random()
 
   constructor(props: {
-    pos: Pos
+    pos: Pos2D
     type: Type
   }) {
     this.pos = props.pos
     this.type = props.type
-    this.color = random().toHex()
   }
 
   public moveTo = (to: Pos2D) => {
     Sand.clearParticleAt(this.pos)
-    drawOrders.push(() => canvas.clearRect(this.pos.x, this.pos.y, 1, 1))
-    this.pos = new Pos(to)
-    Sand.setAndDrawParticle(this)
+    this.pos = to
+    Sand.setParticleAtPos(this)
   }
 
   public moveToAdd = (add: Partial<Pos2D>) => {
     this.moveTo(addPos(this.pos, add))
   }
 
+  public draw = () => {
+    canvas.fillStyle = this.type.color
+    canvas.fillRect(this.pos.x, this.pos.y, 1, 1)
+  }
+
   get left() {
-    return Sand.particleAt(this.pos.add({ x: -1 }))
+    return particleAt(addPos(this.pos, { x: -1 }))
   }
 
   get right() {
-    return Sand.particleAt(this.pos.add({ x: 1 }))
+    return particleAt(addPos(this.pos, { x: 1 }))
   }
 
   get top() {
-    return Sand.particleAt(this.pos.add({ y: -1 }))
+    return particleAt(addPos(this.pos, { y: -1 }))
   }
 
   get bottom() {
-    return Sand.particleAt(this.pos.add({ y: 1 }))
+    return particleAt(addPos(this.pos, { y: 1 }))
   }
 
   get bottomLeft() {
-    return Sand.particleAt(this.pos.add({ x: -1, y: 1 }))
+    return particleAt(addPos(this.pos, { x: -1, y: 1 }))
   }
 
   get bottomRight() {
-    return Sand.particleAt(this.pos.add({ x: 1, y: 1 }))
+    return particleAt(addPos(this.pos, { x: 1, y: 1 }))
   }
 }
 
@@ -87,44 +96,20 @@ const checkRight = (particle: Particle): boolean => {
 }
 
 export const update = () => {
-  for (let y = height - 1; y >= 0; y--) {
-    for (let x = 0; x < width; x++) {
-      const particle = Sand.particleAt({ x, y })
+  for (let i = 0; i < list.length; i++) {
+    const particle = list[i]
 
-      if (particle) {
-        // If below is free, fall
-        if (y < height - 1 && !particle.bottom) {
-          particle.moveToAdd({ y: 1 })
-          continue
-        }
-
-        if (Math.random() > 0.5) {
-          checkLeft(particle) || checkRight(particle)
-        } else {
-          checkRight(particle) || checkLeft(particle)
-        }
-
-        // Else, don't move.
-      }
+    if (particle.pos.y < height - 1 && !particle.bottom) {
+      particle.moveToAdd({ y: 1 })
+      continue
     }
+
+    if (particle.seed > 0.5) {
+      checkLeft(particle) || checkRight(particle)
+    } else {
+      checkRight(particle) || checkLeft(particle)
+    }
+
+    // Else, don't move.
   }
 }
-
-// const conditions = [
-//   (pos: Pos, particle: Particle) => {
-//     // Fall left
-//   if (pos.x > 0 && pos.y < height - 1 && !sand[pos.x - 1][pos.y + 1]) {
-//     moveFromTo(pos, { x: pos.x - 1, y: pos.y + 1 }, particle)
-//     continue
-//   }
-// },
-// (pos: Pos) => {
-//   // Fall right
-//   if (x < width - 1 && y < height - 1 && !sand[x + 1][y + 1]) {
-//     moveFromTo({ x, y }, { x: x + 1, y: y + 1 }, particle)
-//   }
-// }
-// ]
-// const leftOrRight = () => {
-
-// }

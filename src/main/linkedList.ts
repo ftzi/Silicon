@@ -33,11 +33,10 @@ export class LinkedList<T> {
 
     if (this.tail) {
       this.tail.next = newNode
-      this.tail = newNode
     } else {
       this.head = newNode
-      this.tail = newNode
     }
+    this.tail = newNode
     this.size_++
 
     return newNode
