@@ -1,7 +1,9 @@
-import { canvas, width } from "./consts.tsx"
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+import { canvas, width } from "../consts.tsx"
+import { benchmarkData } from "./benchmark.ts"
 
 // const maxFps = 400
-const maxHistorySize = 20
+const maxHistorySize = 10
 
 let lastFrameTime = performance.now()
 const fpsHistory = new Array(maxHistorySize).fill(0) as Array<number>
@@ -28,16 +30,30 @@ const getAverageFps = () => {
 export const drawFps = () => {
   const averageFps = getAverageFps()
 
-  const fpsWidth = 30
-  const fpsHeight = 10
+  const textWidth = 20
+  const textHeight = 7
+
+  const values = [
+    averageFps.toFixed(0),
+    (benchmarkData["draw"].average ?? 0).toFixed(1),
+    (benchmarkData["update"].average ?? 0).toFixed(1),
+  ]
 
   canvas.fillStyle = "black"
-  canvas.fillRect(width - fpsWidth, 0, fpsWidth, fpsHeight)
+  canvas.fillRect(
+    width - textWidth,
+    0,
+    textWidth,
+    textHeight * values.length + 5,
+  )
 
   canvas.fillStyle = "white"
-  canvas.font = "4px 'Press Start 2P'"
+  canvas.font = "3px 'Press Start 2P'"
   canvas.textAlign = "right"
-  canvas.fillText(`${averageFps.toFixed(0)}`, width - 4, 8)
+
+  values.forEach((value, i) =>
+    canvas.fillText(value, width - 4, textHeight * (i + 1)),
+  )
 }
 
 // Also updates lastRenderTime

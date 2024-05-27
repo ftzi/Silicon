@@ -1,4 +1,4 @@
-type LinkedListItem<T> = {
+export type LinkedListItem<T> = {
   value: T
   next: LinkedListItem<T> | null
   prev: LinkedListItem<T> | null

@@ -1,7 +1,6 @@
-import { Particle, Types } from "./Particle.ts"
-import { type Pos2D, addPos } from "./Pos.ts"
-import { Sand } from "./Sand.ts"
+import { Particle, Types, particleAt } from "./Particle.ts"
 import { canvasElement, cellSize } from "./consts.tsx"
+import { type Pos2D, addPos } from "./pos.ts"
 
 let mousePos: Pos2D = { x: 0, y: 0 }
 
@@ -32,12 +31,10 @@ export const actionWhenMouseDown = () => {
           y: y - Math.floor(brushSize / 2),
         })
 
-        Sand.addParticle(
-          new Particle({
-            pos,
-            type: Types.Sand,
-          }),
-        )
+        Particle.create({
+          pos,
+          type: Types.Sand,
+        })
       }
     }
   }
@@ -56,5 +53,12 @@ export const setupMouse = () => {
 
   canvasElement.addEventListener("mouseup", () => {
     isMouseDown = false
+  })
+
+  canvasElement.addEventListener("contextmenu", (event) => {
+    const pos = getMousePos(event)
+    const particle = particleAt(pos)
+
+    console.log(pos, particle)
   })
 }

@@ -1,59 +1,48 @@
 import React, { useEffect, useRef } from "react"
-import { Particle, Types } from "./Particle.ts"
 import { update } from "./Particle.ts"
-import { Sand, particleAt } from "./Sand.ts"
-import {
-  canvas,
-  cellSize,
-  drawOrderI,
-  height,
-  resetDrawOrder,
-  setCanvas,
-  width,
-} from "./consts.tsx"
-import { drawOrders } from "./consts.tsx"
-import { drawFps, shouldLoop, updateFps } from "./fps.ts"
+import { particleAt, setupMatrixParticles } from "./Particle.ts"
+import { canvas, cellSize, height, setCanvas, width } from "./consts.tsx"
+import { drawOrderI, resetDrawOrder } from "./draw.ts"
+import { drawOrders } from "./draw.ts"
+import { benchmark } from "./etc/benchmark.ts"
+import { drawFps, shouldLoop, updateFps } from "./etc/fps.ts"
 import { actionWhenMouseDown, drawMousePosition, setupMouse } from "./mouse.ts"
-
-const canvasSetup = () => {
-  canvas.imageSmoothingEnabled = false
-  canvas.setTransform(1, 0, 0, 1, 0, 0)
-  canvas.scale(cellSize, cellSize)
-}
 
 // TODO remove
 const addParticles = () => {
-  for (let i = 0; i < 5000; i++) {
-    Sand.addParticle(
-      new Particle({
-        pos: {
-          x: Math.floor(Math.random() * width),
-          y: Math.floor(Math.random() * height),
-        },
-        type: Types.Sand,
-      }),
-    )
-  }
+  // for (let x = 0; x < width; x++) {
+  //   for (let y = 0; y < height - 150; y++) {
+  //     Particle.create({
+  //       pos: {
+  //         x,
+  //         y,
+  //       },
+  //       type: Types.Sand,
+  //     })
+  //   }
+  // }
 }
 
 const init = () => {
   canvasSetup()
-  Sand.setup()
+  setupMatrixParticles()
   setupMouse()
   addParticles()
   canvas.clearRect(0, 0, width, height)
 }
 
 const draw = () => {
+  benchmark("draw", "start")
   for (let i = 0; i < drawOrderI; i++) {
     const order = drawOrders[i]
 
-    if (order.draw) particleAt(order.pos)?.draw()
-    else canvas.clearRect(order.pos.x, order.pos.y, 1, 1)
+    if (order.remove) canvas.clearRect(order.pos.x, order.pos.y, 1, 1)
+    else particleAt(order.pos)?.draw()
   }
   resetDrawOrder()
   drawFps()
   drawMousePosition()
+  benchmark("draw", "end")
 }
 
 const loop = () => {
@@ -69,6 +58,12 @@ const loop = () => {
 const start = () => {
   init()
   loop()
+}
+
+const canvasSetup = () => {
+  canvas.imageSmoothingEnabled = false
+  canvas.setTransform(1, 0, 0, 1, 0, 0)
+  canvas.scale(cellSize, cellSize)
 }
 
 export const Canvas = React.memo(() => {
@@ -89,6 +84,7 @@ export const Canvas = React.memo(() => {
       width={width * cellSize}
       height={height * cellSize}
       style={{ border: "1px solid black" }}
+      onContextMenu={(e) => e.preventDefault()}
     />
   )
 })
