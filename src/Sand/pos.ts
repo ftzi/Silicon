@@ -1,21 +1,10 @@
-import { height, width } from "./consts.tsx"
+import { height, width } from "./consts"
 
+// This should be avoided - prefer (x: number, y: number) as it's faster!
 export interface Pos2D {
   x: number
   y: number
 }
 
-export const addPos = (pos: Pos2D, add: Partial<Pos2D>) => ({
-  x: pos.x + (add.x ?? 0),
-  y: pos.y + (add.y ?? 0),
-})
-
-export const isInBounds = (pos: Pos2D) =>
-  pos.x >= 0 && pos.y >= 0 && pos.x < width && pos.y < height
-
-export const LEFT = { x: -1 }
-export const RIGHT = { x: 1 }
-export const TOP = { y: -1 }
-export const BOTTOM = { y: 1 }
-export const BOTTOM_LEFT = { x: -1, y: 1 }
-export const BOTTOM_RIGHT = { x: 1, y: 1 }
+export const isInBounds = (x: number, y: number) =>
+  x >= 0 && y >= 0 && x < width && y < height

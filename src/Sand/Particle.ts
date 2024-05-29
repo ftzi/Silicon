@@ -1,33 +1,39 @@
-import { canvas, height, width } from "./consts.tsx"
-import { addToDrawOrder } from "./draw.ts"
-import { benchmark } from "./etc/benchmark.ts"
-import {
-  BOTTOM,
-  BOTTOM_LEFT,
-  BOTTOM_RIGHT,
-  LEFT,
-  type Pos2D,
-  RIGHT,
-  TOP,
-  addPos,
-  isInBounds,
-} from "./pos.ts"
+import { LinkedList, type LinkedListItem } from "../main/linkedList"
+import { canvas, height, width } from "./consts"
+import { addToDrawOrder } from "./draw"
+import { isInBounds } from "./pos"
+
+type RGB = {
+  r: number
+  g: number
+  b: number
+}
 
 export type Type = {
   color: string
+  rgb: RGB
 }
 
 export const Types = {
   Sand: {
     color: "tan",
+    rgb: {
+      r: 210,
+      g: 180,
+      b: 140,
+    },
   },
 } satisfies Record<string, Type>
 
 const matrixParticles: Array<Array<Particle | undefined>> = []
-// const linkedParticles = new LinkedList<Particle>()
 
-export const particleAt = (pos: Pos2D): Particle | undefined =>
-  matrixParticles[pos.x][pos.y]
+export const linkedParticles = new LinkedList<Particle>()
+
+export const particleAt = (x: number, y: number): Particle | undefined =>
+  matrixParticles[x][y]
+
+export const particleAtSafe = (x: number, y: number): Particle | undefined =>
+  matrixParticles[x]?.[y]
 
 export const setupMatrixParticles = () => {
   for (let x = 0; x < width; x++)
@@ -35,89 +41,93 @@ export const setupMatrixParticles = () => {
 }
 
 export class Particle {
-  // public readonly node: LinkedListItem<Particle> = linkedParticles.append(this)
+  public readonly node: LinkedListItem<Particle> = linkedParticles.append(this)
   public readonly seed: number = Math.random()
 
   private constructor(
-    public pos: Pos2D,
+    public x: number,
+    public y: number,
     public type: Type,
   ) {}
 
-  public static create(props: { pos: Pos2D; type: Type; replace?: boolean }) {
-    if (isInBounds(props.pos)) {
-      if (props.replace || !particleAt(props.pos)) {
-        const particle = new Particle(props.pos, props.type)
+  public static create({
+    x,
+    y,
+    type,
+    replace,
+  }: { x: number; y: number; type: Type; replace?: boolean }) {
+    if (isInBounds(x, y)) {
+      const particleAtPos = particleAt(x, y)
 
-        matrixParticles[props.pos.x][props.pos.y] = particle
+      if (particleAtPos) {
+        if (!replace || type === particleAtPos.type) return
+        particleAtPos.remove()
       }
+      const particle = new Particle(x, y, type)
+
+      matrixParticles[x][y] = particle
+      addToDrawOrder({ x, y })
     }
   }
 
   public draw = () => {
     canvas.fillStyle = this.type.color
-    canvas.fillRect(this.pos.x, this.pos.y, 1, 1)
+    canvas.fillRect(this.x, this.y, 1, 1)
   }
 
-  public moveTo = (to: Pos2D) => {
-    if (isInBounds(to)) {
-      matrixParticles[this.pos.x][this.pos.y] = undefined
-      addToDrawOrder({ pos: { ...this.pos }, remove: true })
+  public moveTo = (x: number, y: number) => {
+    if (isInBounds(x, y)) {
+      matrixParticles[this.x][this.y] = undefined
+      addToDrawOrder({ x: this.x, y: this.y })
 
-      this.pos = to
+      this.x = x
+      this.y = y
 
-      matrixParticles[this.pos.x][this.pos.y] = this
-      addToDrawOrder({ pos: { ...this.pos } })
+      matrixParticles[this.x][this.y] = this
+      addToDrawOrder({ x: this.x, y: this.y })
     } else {
       this.remove()
     }
   }
 
-  public moveToAdd = (add: Partial<Pos2D>) => {
-    this.moveTo(addPos(this.pos, add))
+  public moveToAdd = (x: number, y: number) => {
+    this.moveTo(this.x + x, this.y + y)
   }
 
-  private remove = () => {
-    matrixParticles[this.pos.x][this.pos.y] = undefined
-    // this.node.remove()
-    addToDrawOrder({ pos: { ...this.pos }, remove: true })
-  }
-
-  public neighbor(pos: Pos2D) {
-    return particleAt(addPos(this.pos, pos))
+  public remove = () => {
+    matrixParticles[this.x][this.y] = undefined
+    this.node.remove()
+    addToDrawOrder({ x: this.x, y: this.y })
   }
 
   get left() {
-    return particleAt(addPos(this.pos, LEFT))
+    return particleAt(this.x - 1, this.y)
   }
 
   get right() {
-    return particleAt(addPos(this.pos, RIGHT))
+    return particleAt(this.x + 1, this.y)
   }
 
   get top() {
-    return particleAt(addPos(this.pos, TOP))
+    return particleAt(this.x, this.y - 1)
   }
 
   get bottom() {
-    return particleAt(addPos(this.pos, BOTTOM))
+    return particleAt(this.x, this.y + 1)
   }
 
   get bottomLeft() {
-    return particleAt(addPos(this.pos, BOTTOM_LEFT))
+    return particleAt(this.x - 1, this.y + 1)
   }
 
   get bottomRight() {
-    return particleAt(addPos(this.pos, BOTTOM_RIGHT))
+    return particleAt(this.x + 1, this.y + 1)
   }
 }
 
-const checkLeft = (particle: Particle): boolean => {
-  if (
-    particle.pos.x > 0 &&
-    particle.pos.y < height - 1 &&
-    !particle.bottomLeft
-  ) {
-    particle.moveToAdd(BOTTOM_LEFT)
+export const checkLeft = (particle: Particle): boolean => {
+  if (particle.x > 0 && particle.y < height - 1 && !particle.bottomLeft) {
+    particle.moveToAdd(-1, 1)
 
     return true
   }
@@ -125,55 +135,16 @@ const checkLeft = (particle: Particle): boolean => {
   return false
 }
 
-const checkRight = (particle: Particle): boolean => {
+export const checkRight = (particle: Particle): boolean => {
   if (
-    particle.pos.x < width - 1 &&
-    particle.pos.y < height - 1 &&
+    particle.x < width - 1 &&
+    particle.y < height - 1 &&
     !particle.bottomRight
   ) {
-    particle.moveToAdd(BOTTOM_RIGHT)
+    particle.moveToAdd(1, 1)
 
     return true
   }
 
   return false
-}
-
-export const update = () => {
-  const hasGround = true as boolean
-
-  benchmark("update", "start")
-
-  // const fromHead = true
-
-  // // This avoids logical biases in the behavior of the particle.
-  // let node = fromHead ? linkedParticles.head : linkedParticles.tail
-
-  // while (node) {
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      const particle = matrixParticles[x][y]
-
-      if (!particle) continue
-
-      if (
-        (hasGround ? particle.pos.y < height - 1 : true) &&
-        !particle.bottom
-      ) {
-        particle.moveToAdd(BOTTOM)
-        continue
-      }
-
-      if (particle.seed > 0.5) {
-        checkLeft(particle) || checkRight(particle)
-      } else {
-        checkRight(particle) || checkLeft(particle)
-      }
-    }
-  }
-  // const particle = node.value
-
-  // Else, don't move.
-  // node = fromHead ? node.next : node.prev
-  benchmark("update", "end")
 }

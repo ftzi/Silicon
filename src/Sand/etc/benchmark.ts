@@ -16,7 +16,6 @@ export const benchmark = (identifier: string, type: "start" | "end") => {
   const records = benchmark.records
 
   if (type === "start") {
-    if (records.length === benchmarkLength - 1) console.log(benchmark.average)
     records.push({
       start: performance.now(),
     })

@@ -1,10 +1,32 @@
-import { Particle, Types, particleAt } from "./Particle.ts"
-import { canvasElement, cellSize } from "./consts.tsx"
-import { type Pos2D, addPos } from "./pos.ts"
+import { Particle, Types, particleAtSafe } from "./Particle"
+import { canvas, canvasElement, cellSize } from "./consts"
+import { drawPosition } from "./draw"
+import { type Pos2D, isInBounds } from "./pos"
+import { getCircleOutlinePoints, getCirclePoints, getLinePixels } from "./utils"
 
-let mousePos: Pos2D = { x: 0, y: 0 }
+let mousePos: Pos2D | undefined = undefined
+let isMouseLeftDown = false
+let isMouseRightDown = false
+let draggingLeftFrom: Pos2D | undefined = undefined
+let draggingRightFrom: Pos2D | undefined = undefined
+// const mouseStuff: { x: number; y: number; points: Pos2D } | undefined =
+//   undefined
+const mousePosToClear: Array<Pos2D> = []
+const radius = 8
 
-export const getMousePos = (event: MouseEvent) => {
+export const Mouse = {
+  setup: () => {
+    setupMouse()
+  },
+  update: () => {
+    actionWhenMouseDown()
+  },
+  draw: () => {
+    drawMousePosition()
+  },
+}
+
+const getMousePos = (event: MouseEvent): Pos2D => {
   const rect = canvasElement.getBoundingClientRect()
 
   return {
@@ -13,52 +35,69 @@ export const getMousePos = (event: MouseEvent) => {
   }
 }
 
-export const drawMousePosition = () => {
-  // canvas.fillStyle = "red"
-  // canvas.beginPath()
-  // canvas.arc(mousePos.x, mousePos.y, 5, 0, 2 * Math.PI)
-  // canvas.fill()
-}
+const drawMousePosition = () => {
+  mousePosToClear.forEach((pos) => drawPosition(pos.x, pos.y))
+  mousePosToClear.length = 0
 
-const brushSize = 10
-
-export const actionWhenMouseDown = () => {
-  if (isMouseDown) {
-    for (let x = 0; x < brushSize; x++) {
-      for (let y = 0; y < brushSize; y++) {
-        const pos = addPos(mousePos, {
-          x: x - Math.floor(brushSize / 2),
-          y: y - Math.floor(brushSize / 2),
-        })
-
-        Particle.create({
-          pos,
-          type: Types.Sand,
-        })
+  if (mousePos && isInBounds(mousePos.x, mousePos.y)) {
+    getCircleOutlinePoints(mousePos.x, mousePos.y, radius).forEach((pos) => {
+      if (isInBounds(pos.x, pos.y)) {
+        canvas.fillStyle = "#ff000040"
+        canvas.fillRect(pos.x, pos.y, 1, 1)
+        mousePosToClear.push({ ...pos })
       }
-    }
+    })
   }
 }
 
-let isMouseDown = false
+const actionWhenMouseDown = () => {
+  if (!mousePos) return
 
-export const setupMouse = () => {
+  if (isMouseLeftDown) {
+    getLinePixels(draggingLeftFrom ?? mousePos, mousePos).forEach((linePos) => {
+      getCirclePoints({ ...linePos, radius }).forEach((pos) => {
+        Particle.create({
+          ...pos,
+          type: Types.Sand,
+          replace: true,
+        })
+      })
+    })
+    draggingLeftFrom = mousePos
+  } else if (isMouseRightDown) {
+    getLinePixels(draggingRightFrom ?? mousePos, mousePos).forEach(
+      (linePos) => {
+        getCirclePoints({ ...linePos, radius }).forEach((pos) => {
+          particleAtSafe(pos.x, pos.y)?.remove()
+        })
+      },
+    )
+    draggingRightFrom = mousePos
+  }
+}
+
+const setupMouse = () => {
   canvasElement.addEventListener("mousemove", (event) => {
     mousePos = getMousePos(event)
   })
 
-  canvasElement.addEventListener("mousedown", () => {
-    isMouseDown = true
+  canvasElement.addEventListener("mousedown", (event) => {
+    if (event.button === 0) isMouseLeftDown = true
+    if (event.button === 2) isMouseRightDown = true
   })
 
-  canvasElement.addEventListener("mouseup", () => {
-    isMouseDown = false
+  canvasElement.addEventListener("mouseup", (event) => {
+    if (event.button === 0) {
+      isMouseLeftDown = false
+      draggingLeftFrom = undefined
+    }
+    if (event.button === 2) {
+      isMouseRightDown = false
+      draggingRightFrom = undefined
+    }
   })
 
   canvasElement.addEventListener("contextmenu", (event) => {
-    const pos = getMousePos(event)
-    const particle = particleAt(pos)
-
-    console.log(pos, particle)
+    event.preventDefault()
   })
 }

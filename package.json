@@ -2,7 +2,7 @@
   "name": "falling-sand",
   "version": "0.0.0",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --minify=false",
     "dev": "vite",
     "format": "biome check --apply-unsafe . && eslint --fix . package.json",
     "format:check": "biome check . && eslint . package.json",
@@ -25,9 +25,15 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "acorn": "^8.11.3",
+    "acorn-walk": "^8.3.2",
+    "babel-plugin-inline-functions": "^1.0.1",
     "eslint-config-gev": "^4.5.1",
     "husky": "^9.0.11",
+    "magic-string": "^0.30.10",
+    "rollup-plugin-inline-js": "^0.5.0",
     "typescript": "^5.4.5",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "vite-plugin-babel": "^1.2.0"
   }
 }

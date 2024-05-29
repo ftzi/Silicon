@@ -3,7 +3,7 @@
   "formatter": {
     "indentWidth": 2,
     "indentStyle": "space",
-    "ignore": ["package.json"]
+    "ignore": ["package.json", "dist"]
   },
   "linter": {
     "rules": {
@@ -11,7 +11,8 @@
         "noForEach": "off",
         "useLiteralKeys": "off"
       }
-    }
+    },
+    "ignore": ["package.json", "dist"]
   },
 
   "javascript": {

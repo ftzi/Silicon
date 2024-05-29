@@ -1,16 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import { canvas, width } from "../consts.tsx"
-import { benchmarkData } from "./benchmark.ts"
+import { linkedParticles } from "../Particle"
+import { canvas, width } from "../consts"
+import { benchmarkData } from "./benchmark"
 
 // const maxFps = 400
+// const targetFrameDuration = (1000 / maxFps) * 0.9
 const maxHistorySize = 10
-
-let lastFrameTime = performance.now()
 const fpsHistory = new Array(maxHistorySize).fill(0) as Array<number>
 let fpsIndex = 0
-let lastRenderTime = 0
+let lastFrameTime = performance.now()
 
-export const updateFps = () => {
+export const Fps = {
+  update: () => {
+    updateFps()
+  },
+  draw: () => {
+    drawFps()
+  },
+  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 0,
+}
+
+const updateFps = () => {
   const now = performance.now()
   const deltaTime = now - lastFrameTime
 
@@ -21,23 +31,23 @@ export const updateFps = () => {
   fpsIndex = (fpsIndex + 1) % maxHistorySize
 }
 
-const getAverageFps = () => {
-  const sum = fpsHistory.reduce((a, b) => a + b, 0)
+const getAverageFps = () =>
+  fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length
 
-  return sum / fpsHistory.length
-}
-
-export const drawFps = () => {
+const drawFps = () => {
   const averageFps = getAverageFps()
-
-  const textWidth = 20
-  const textHeight = 7
 
   const values = [
     averageFps.toFixed(0),
-    (benchmarkData["draw"].average ?? 0).toFixed(1),
-    (benchmarkData["update"].average ?? 0).toFixed(1),
+    `Draw ${(benchmarkData["draw"].average ?? 0).toFixed(1)}`,
+    `Upda ${(benchmarkData["update"].average ?? 0).toFixed(1)}`,
+    `Part ${linkedParticles.size}`,
   ]
+
+  const maxLen = values.reduce((a, b) => (b.length > a ? b.length : a), 0)
+
+  const textWidth = maxLen * 4
+  const textHeight = 7
 
   canvas.fillStyle = "black"
   canvas.fillRect(
@@ -54,20 +64,4 @@ export const drawFps = () => {
   values.forEach((value, i) =>
     canvas.fillText(value, width - 4, textHeight * (i + 1)),
   )
-}
-
-// Also updates lastRenderTime
-// const targetFrameDuration = 1000 / maxFps
-
-export const shouldLoop = (): boolean => {
-  const now = performance.now()
-  const timeSinceLastRender = now - lastRenderTime
-
-  if (timeSinceLastRender >= 0) {
-    lastRenderTime = now
-
-    return true
-  }
-
-  return false
 }
