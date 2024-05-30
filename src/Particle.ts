@@ -57,7 +57,7 @@ export class Particle {
       const particle = new Particle(x, y, entity)
 
       matrixParticles[x]![y] = particle
-      addToDrawOrder({ x, y })
+      addToDrawOrder(x, y)
     }
   }
 
@@ -66,16 +66,16 @@ export class Particle {
     canvas.rect(this.x, this.y, 1, 1)
   }
 
-  public moveTo = (x: number, y: number) => {
+  private moveTo = (x: number, y: number) => {
     if (isInBounds(x, y)) {
       matrixParticles[this.x]![this.y] = undefined
-      addToDrawOrder({ x: this.x, y: this.y })
+      addToDrawOrder(this.x, this.y)
 
       this.x = x
       this.y = y
 
       matrixParticles[this.x]![this.y] = this
-      addToDrawOrder({ x: this.x, y: this.y })
+      addToDrawOrder(this.x, this.y)
     } else {
       this.remove()
     }
@@ -88,36 +88,36 @@ export class Particle {
   public remove = () => {
     matrixParticles[this.x]![this.y] = undefined
     this.node.remove()
-    addToDrawOrder({ x: this.x, y: this.y })
+    addToDrawOrder(this.x, this.y)
   }
 
   get left() {
-    return particleAt(this.x - 1, this.y)
+    return particleAtSafe(this.x - 1, this.y)
   }
 
   get right() {
-    return particleAt(this.x + 1, this.y)
+    return particleAtSafe(this.x + 1, this.y)
   }
 
   get top() {
-    return particleAt(this.x, this.y - 1)
+    return particleAtSafe(this.x, this.y - 1)
   }
 
   get bottom() {
-    return particleAt(this.x, this.y + 1)
+    return particleAtSafe(this.x, this.y + 1)
   }
 
   get bottomLeft() {
-    return particleAt(this.x - 1, this.y + 1)
+    return particleAtSafe(this.x - 1, this.y + 1)
   }
 
   get bottomRight() {
-    return particleAt(this.x + 1, this.y + 1)
+    return particleAtSafe(this.x + 1, this.y + 1)
   }
 }
 
 export const checkLeft = (particle: Particle): boolean => {
-  if (particle.x > 0 && particle.y < height - 1 && !particle.bottomLeft) {
+  if (!particle.bottomLeft && particle.x > 0 && particle.y < height - 1) {
     particle.moveToAdd(-1, 1)
 
     return true
@@ -128,9 +128,9 @@ export const checkLeft = (particle: Particle): boolean => {
 
 export const checkRight = (particle: Particle): boolean => {
   if (
+    !particle.bottomRight &&
     particle.x < width - 1 &&
-    particle.y < height - 1 &&
-    !particle.bottomRight
+    particle.y < height - 1
   ) {
     particle.moveToAdd(1, 1)
 

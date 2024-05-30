@@ -15,14 +15,10 @@ export const getCirclePoints = ({
 }: { x: number; y: number; radius: number }): Array<Pos> => {
   const points: Array<Pos> = []
 
-  const addPoint = (x: number, y: number) => {
-    points.push({ x, y })
-  }
-
   for (let y_ = -radius; y_ <= radius; y_++) {
     for (let x_ = -radius; x_ <= radius; x_++) {
       if (x_ * x_ + y_ * y_ <= radius * radius) {
-        addPoint(x + x_, y + y_)
+        points.push({ x: x + x_, y: y + y_ })
       }
     }
   }

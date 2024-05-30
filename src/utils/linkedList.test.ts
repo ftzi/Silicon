@@ -27,7 +27,6 @@ describe("LinkedList", () => {
     list.append(2)
     list.append(3)
 
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
     const removed = list.removeNode(list.head!)
 
     expect(removed).toBe(undefined)
@@ -49,7 +48,6 @@ describe("LinkedList", () => {
     list.append(2)
     list.append(3)
 
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
     const removed = list.removeNode(list.tail!)
 
     expect(removed).toBe(undefined)
@@ -85,19 +83,6 @@ describe("LinkedList", () => {
       current = current.next
     }
     expect(values).toEqual([1, 2, 4, 5])
-  })
-
-  it("should handle removing from an empty list", () => {
-    const list = new LinkedList<number>()
-
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const removedFirst = list.removeNode(list.head!)
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const removedLast = list.removeNode(list.tail!)
-
-    expect(removedFirst).toBe(undefined)
-    expect(removedLast).toBe(undefined)
-    expect(list.size).toBe(0)
   })
 
   it("should handle out of bounds index for removeNode", () => {

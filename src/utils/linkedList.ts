@@ -6,19 +6,9 @@ export type LinkedListItem<T> = {
 }
 
 export class LinkedList<T> {
-  head: LinkedListItem<T> | null
-  tail: LinkedListItem<T> | null
-  private size_: number
-
-  get size() {
-    return this.size_
-  }
-
-  constructor() {
-    this.head = null
-    this.tail = null
-    this.size_ = 0
-  }
+  public head: LinkedListItem<T> | null = null
+  public tail: LinkedListItem<T> | null = null
+  public size = 0
 
   append(value: T): LinkedListItem<T> {
     const newNode: LinkedListItem<T> = {
@@ -33,14 +23,12 @@ export class LinkedList<T> {
     if (this.tail) this.tail.next = newNode
     else this.head = newNode
     this.tail = newNode
-    this.size_++
+    this.size++
 
     return newNode
   }
 
   removeNode(node: LinkedListItem<T>): void {
-    if (!this.head) return
-
     if (node === this.head) {
       this.head = this.head.next
       if (this.head) this.head.prev = null
@@ -51,6 +39,9 @@ export class LinkedList<T> {
       if (this.tail === node) this.tail = node.prev
     }
 
-    this.size_--
+    node.next = null
+    node.prev = null
+
+    this.size--
   }
 }

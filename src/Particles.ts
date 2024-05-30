@@ -1,29 +1,28 @@
-import { checkLeft, checkRight, linkedParticles } from "./Particle"
+import { Entities } from "./Entities/Entities"
+import { Particle, checkLeft, checkRight, linkedParticles } from "./Particle"
 
 import { height } from "./utils/consts"
 import { benchmark } from "./utils/fps"
+import { forWholeScreen } from "./utils/pos"
 
 export const Particles = {
-  setup: () => {},
+  setup: () => {
+    forWholeScreen((x, y) =>
+      Particle.create({
+        x,
+        y,
+        entity: Entities.Sand,
+        replace: true,
+      }),
+    )
+  },
   update: () => {
-    // for (let y = 0; y < 1; y++) {
-    //   for (let x = 0; x < width; x++) {
-    //     Particle.create({
-    //       x,
-    //       y,
-    //       entity: Entities.Sand,
-    //       replace: true,
-    //     })
-    //   }
-    // }
     updateParticles()
   },
 }
 
 const updateParticles = () => {
-  const hasGround = true as boolean
-
-  benchmark("update", "start")
+  benchmark("update")
 
   const fromHead = Math.random() > 0.5
 
@@ -33,10 +32,9 @@ const updateParticles = () => {
   while (node) {
     const particle = node.value
 
-    // This must be before the `continue`.
     node = fromHead ? node.next : node.prev
 
-    if ((hasGround ? particle.y < height - 1 : true) && !particle.bottom) {
+    if (!particle.bottom && particle.y < height - 1) {
       particle.moveToAdd(0, 1)
       continue
     }
@@ -49,5 +47,5 @@ const updateParticles = () => {
   }
 
   // Else, don't move.
-  benchmark("update", "end")
+  benchmark("update", true)
 }

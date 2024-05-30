@@ -6,24 +6,30 @@ import {
   invertedBackgroundColor,
   width,
 } from "./utils/consts"
-import type { Pos } from "./utils/pos"
 
-const drawOrdersArray: Array<Pos> = []
+const drawOrdersArrayX: Array<number> = []
+const drawOrdersArrayY: Array<number> = []
 let drawOrderI = 0
 
-export const addToDrawOrder = (order: Pos) => {
-  drawOrdersArray[drawOrderI++] = order
+export const addToDrawOrder = (x: number, y: number) => {
+  drawOrdersArrayX[drawOrderI] = x
+  drawOrdersArrayY[drawOrderI++] = y
 }
 
-const updateOrders = () => {
-  for (let i = 0; i < drawOrderI; i++) {
-    const order = drawOrdersArray[i]!
+/** Returns if there was a change */
+const updateOrders = (): boolean => {
+  const hasChanges = drawOrderI > 0
 
-    imageDataArray[order.y * imageData.width + order.x] =
-      particleAt(order.x, order.y)?.entity.invertedRgb ??
-      invertedBackgroundColor
+  for (let i = 0; i < drawOrderI; i++) {
+    const x = drawOrdersArrayX[i]!
+    const y = drawOrdersArrayY[i]!
+
+    imageDataArray[y * imageData.width + x] =
+      particleAt(x, y)?.entity.invertedRgb ?? invertedBackgroundColor
   }
   drawOrderI = 0
+
+  return hasChanges
 }
 
 export const drawPosition = (x: number, y: number) => {

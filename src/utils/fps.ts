@@ -75,7 +75,7 @@ export const benchmarkData: Record<
   { records: Array<BenchmarkRecord>; average: number; index: number }
 > = {}
 
-export const benchmark = (identifier: string, type: "start" | "end") => {
+export const benchmark = (identifier: string, end?: true) => {
   // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
   const benchmark = (benchmarkData[identifier] ??= {
     records: [],
@@ -84,7 +84,7 @@ export const benchmark = (identifier: string, type: "start" | "end") => {
   })
   const records = benchmark.records
 
-  if (type === "start") {
+  if (!end) {
     records[benchmark.index] = { start: performance.now() }
 
     return

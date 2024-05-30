@@ -16,7 +16,7 @@ let draggingLeftFrom: Pos | undefined = undefined
 let draggingRightFrom: Pos | undefined = undefined
 
 const mousePosToClear: Array<Pos> = []
-const radius = 8
+const radius = 15
 
 export const Mouse = {
   setup: () => {
@@ -90,7 +90,7 @@ const setupMouse = () => {
     if (event.button === 2) isMouseRightDown = true
   })
 
-  canvasElement.addEventListener("mouseup", (event) => {
+  document.addEventListener("mouseup", (event) => {
     if (event.button === 0) {
       isMouseLeftDown = false
       draggingLeftFrom = undefined

@@ -17,11 +17,11 @@ const setup = () => {
 }
 
 const draw = async () => {
-  benchmark("draw", "start")
+  benchmark("draw")
   await Draw.draw()
   Mouse.draw()
   Fps.draw()
-  benchmark("draw", "end")
+  benchmark("draw", true)
 }
 
 const loop = async () => {
