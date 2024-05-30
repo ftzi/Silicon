@@ -11,7 +11,7 @@ export const addToDrawOrder = (order: DrawOrder) => {
   drawOrdersArray[drawOrderI++] = order
 }
 
-const drawOrders = () => {
+const updateOrders = () => {
   for (let i = 0; i < drawOrderI; i++) {
     const order = drawOrdersArray[i]
     // const particle = particleAt(order.x, order.y)
@@ -55,7 +55,7 @@ export const Draw = {
     imageData = canvas.createImageData(realWidth, realHeight)
   },
   draw: () => {
-    drawOrders()
+    updateOrders()
     canvas.putImageData(imageData, 0, 0)
   },
 }
