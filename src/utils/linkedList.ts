@@ -20,7 +20,6 @@ export class LinkedList<T> {
     this.size_ = 0
   }
 
-  // Append an item to the end of the list
   append(value: T): LinkedListItem<T> {
     const newNode: LinkedListItem<T> = {
       value,
@@ -31,38 +30,25 @@ export class LinkedList<T> {
       },
     }
 
-    if (this.tail) {
-      this.tail.next = newNode
-    } else {
-      this.head = newNode
-    }
+    if (this.tail) this.tail.next = newNode
+    else this.head = newNode
     this.tail = newNode
     this.size_++
 
     return newNode
   }
 
-  // Remove a node from the list
   removeNode(node: LinkedListItem<T>): void {
     if (!this.head) return
 
     if (node === this.head) {
       this.head = this.head.next
-      if (this.head) {
-        this.head.prev = null
-      } else {
-        this.tail = null
-      }
+      if (this.head) this.head.prev = null
+      else this.tail = null
     } else {
-      if (node.prev) {
-        node.prev.next = node.next
-      }
-      if (node.next) {
-        node.next.prev = node.prev
-      }
-      if (this.tail === node) {
-        this.tail = node.prev
-      }
+      if (node.prev) node.prev.next = node.next
+      if (node.next) node.next.prev = node.prev
+      if (this.tail === node) this.tail = node.prev
     }
 
     this.size_--

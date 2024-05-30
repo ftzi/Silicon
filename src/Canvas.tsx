@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from "react"
-import { cellSize, height, setCanvas, width } from "./consts"
 import { start } from "./main"
+import { height, scale, setCanvas, width } from "./utils/consts"
 
 export const Canvas = React.memo(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
     setCanvas(canvasRef.current!)
     start()
   }, [])
@@ -14,8 +13,8 @@ export const Canvas = React.memo(() => {
   return (
     <canvas
       ref={canvasRef}
-      width={width * cellSize}
-      height={height * cellSize}
+      width={width * scale}
+      height={height * scale}
       style={{ border: "1px solid black" }}
     />
   )

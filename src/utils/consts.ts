@@ -1,7 +1,10 @@
+import { type Rgb, invertHex } from "./color"
+
 export const width = 300
 export const height = 200
-export const cellSize = 3
-export const maxParticles = 5000
+export const scale = 3
+export const backgroundColor: Rgb = "#121212"
+export const invertedBackgroundColor = invertHex(backgroundColor)
 
 export let canvas: CanvasRenderingContext2D =
   undefined as unknown as CanvasRenderingContext2D
@@ -10,6 +13,5 @@ export let canvasElement: HTMLCanvasElement =
 
 export const setCanvas = (canvasElement_: HTMLCanvasElement) => {
   canvasElement = canvasElement_
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   canvas = canvasElement_.getContext("2d")!
 }

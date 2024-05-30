@@ -1,17 +1,21 @@
-import { Particle, Types, particleAtSafe } from "./Particle"
-import { canvas, canvasElement, cellSize } from "./consts"
-import { drawPosition } from "./draw"
-import { type Pos2D, isInBounds } from "./pos"
-import { getCircleOutlinePoints, getCirclePoints, getLinePixels } from "./utils"
+import { drawPosition } from "./Draw"
+import { Entities } from "./Entities/Entities"
+import { Particle, particleAtSafe } from "./Particle"
+import { canvas, canvasElement, scale } from "./utils/consts"
+import {
+  getCircleOutlinePoints,
+  getCirclePoints,
+  getLinePoints,
+} from "./utils/pos"
+import { type Pos, isInBounds } from "./utils/pos"
 
-let mousePos: Pos2D | undefined = undefined
+let mousePos: Pos | undefined = undefined
 let isMouseLeftDown = false
 let isMouseRightDown = false
-let draggingLeftFrom: Pos2D | undefined = undefined
-let draggingRightFrom: Pos2D | undefined = undefined
-// const mouseStuff: { x: number; y: number; points: Pos2D } | undefined =
-//   undefined
-const mousePosToClear: Array<Pos2D> = []
+let draggingLeftFrom: Pos | undefined = undefined
+let draggingRightFrom: Pos | undefined = undefined
+
+const mousePosToClear: Array<Pos> = []
 const radius = 8
 
 export const Mouse = {
@@ -26,12 +30,12 @@ export const Mouse = {
   },
 }
 
-const getMousePos = (event: MouseEvent): Pos2D => {
+const getMousePos = (event: MouseEvent): Pos => {
   const rect = canvasElement.getBoundingClientRect()
 
   return {
-    x: Math.floor((event.clientX - rect.left) / cellSize),
-    y: Math.floor((event.clientY - rect.top) / cellSize),
+    x: Math.floor((event.clientX - rect.left) / scale),
+    y: Math.floor((event.clientY - rect.top) / scale),
   }
 }
 
@@ -54,18 +58,18 @@ const actionWhenMouseDown = () => {
   if (!mousePos) return
 
   if (isMouseLeftDown) {
-    getLinePixels(draggingLeftFrom ?? mousePos, mousePos).forEach((linePos) => {
+    getLinePoints(draggingLeftFrom ?? mousePos, mousePos).forEach((linePos) => {
       getCirclePoints({ ...linePos, radius }).forEach((pos) => {
         Particle.create({
           ...pos,
-          type: Types.Sand,
+          entity: Entities.Sand,
           replace: true,
         })
       })
     })
     draggingLeftFrom = mousePos
   } else if (isMouseRightDown) {
-    getLinePixels(draggingRightFrom ?? mousePos, mousePos).forEach(
+    getLinePoints(draggingRightFrom ?? mousePos, mousePos).forEach(
       (linePos) => {
         getCirclePoints({ ...linePos, radius }).forEach((pos) => {
           particleAtSafe(pos.x, pos.y)?.remove()

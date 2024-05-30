@@ -1,7 +1,8 @@
-import { LinkedList, type LinkedListItem } from "../main/linkedList"
-import { canvas, height, width } from "./consts"
-import { addToDrawOrder } from "./draw"
-import { isInBounds } from "./pos"
+import { addToDrawOrder } from "./Draw"
+import type { Entity } from "./Entities/Entity"
+import { canvas, height, width } from "./utils/consts"
+import { LinkedList, type LinkedListItem } from "./utils/linkedList"
+import { isInBounds } from "./utils/pos"
 
 type RGB = {
   r: number
@@ -12,25 +13,15 @@ type RGB = {
 export type Type = {
   color: string
   rgb: RGB
+  rgb2: number
 }
-
-export const Types = {
-  Sand: {
-    color: "tan",
-    rgb: {
-      r: 210,
-      g: 180,
-      b: 140,
-    },
-  },
-} satisfies Record<string, Type>
 
 const matrixParticles: Array<Array<Particle | undefined>> = []
 
 export const linkedParticles = new LinkedList<Particle>()
 
 export const particleAt = (x: number, y: number): Particle | undefined =>
-  matrixParticles[x][y]
+  matrixParticles[x]![y]
 
 export const particleAtSafe = (x: number, y: number): Particle | undefined =>
   matrixParticles[x]?.[y]
@@ -47,43 +38,43 @@ export class Particle {
   private constructor(
     public x: number,
     public y: number,
-    public type: Type,
+    public entity: Entity,
   ) {}
 
   public static create({
     x,
     y,
-    type,
+    entity,
     replace,
-  }: { x: number; y: number; type: Type; replace?: boolean }) {
+  }: { x: number; y: number; entity: Entity; replace?: boolean }) {
     if (isInBounds(x, y)) {
       const particleAtPos = particleAt(x, y)
 
       if (particleAtPos) {
-        if (!replace || type === particleAtPos.type) return
+        if (!replace || entity === particleAtPos.entity) return
         particleAtPos.remove()
       }
-      const particle = new Particle(x, y, type)
+      const particle = new Particle(x, y, entity)
 
-      matrixParticles[x][y] = particle
+      matrixParticles[x]![y] = particle
       addToDrawOrder({ x, y })
     }
   }
 
   public draw = () => {
-    canvas.fillStyle = this.type.color
-    canvas.fillRect(this.x, this.y, 1, 1)
+    canvas.fillStyle = this.entity.rgb
+    canvas.rect(this.x, this.y, 1, 1)
   }
 
   public moveTo = (x: number, y: number) => {
     if (isInBounds(x, y)) {
-      matrixParticles[this.x][this.y] = undefined
+      matrixParticles[this.x]![this.y] = undefined
       addToDrawOrder({ x: this.x, y: this.y })
 
       this.x = x
       this.y = y
 
-      matrixParticles[this.x][this.y] = this
+      matrixParticles[this.x]![this.y] = this
       addToDrawOrder({ x: this.x, y: this.y })
     } else {
       this.remove()
@@ -95,7 +86,7 @@ export class Particle {
   }
 
   public remove = () => {
-    matrixParticles[this.x][this.y] = undefined
+    matrixParticles[this.x]![this.y] = undefined
     this.node.remove()
     addToDrawOrder({ x: this.x, y: this.y })
   }

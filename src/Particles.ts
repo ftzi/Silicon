@@ -1,27 +1,21 @@
-import {
-  Particle,
-  Types,
-  checkLeft,
-  checkRight,
-  linkedParticles,
-} from "./Particle"
+import { checkLeft, checkRight, linkedParticles } from "./Particle"
 
-import { height, width } from "./consts"
-import { benchmark } from "./etc/benchmark"
+import { height } from "./utils/consts"
+import { benchmark } from "./utils/fps"
 
 export const Particles = {
   setup: () => {},
   update: () => {
-    for (let y = 0; y < 1; y++) {
-      for (let x = 0; x < width; x++) {
-        Particle.create({
-          x,
-          y,
-          type: Types.Sand,
-          replace: true,
-        })
-      }
-    }
+    // for (let y = 0; y < 1; y++) {
+    //   for (let x = 0; x < width; x++) {
+    //     Particle.create({
+    //       x,
+    //       y,
+    //       entity: Entities.Sand,
+    //       replace: true,
+    //     })
+    //   }
+    // }
     updateParticles()
   },
 }

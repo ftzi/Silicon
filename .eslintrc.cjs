@@ -25,5 +25,8 @@ module.exports = {
     },
   ],
   ignorePatterns: ["/lib/**/*", "/dist/**/*"],
-  rules: {},
+  rules: {
+    // Gotta increase the fps!
+    // "@typescript-eslint/no-unnecessary-type-assertion": "off",
+  },
 }

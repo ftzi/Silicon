@@ -1,11 +1,19 @@
-import type { Pos2D } from "./pos"
+import { height, width } from "./consts"
+
+export interface Pos {
+  x: number
+  y: number
+}
+
+export const isInBounds = (x: number, y: number) =>
+  x >= 0 && y >= 0 && x < width && y < height
 
 export const getCirclePoints = ({
   x,
   y,
   radius,
-}: { x: number; y: number; radius: number }): Array<Pos2D> => {
-  const points: Array<Pos2D> = []
+}: { x: number; y: number; radius: number }): Array<Pos> => {
+  const points: Array<Pos> = []
 
   const addPoint = (x: number, y: number) => {
     points.push({ x, y })
@@ -26,8 +34,8 @@ export const getCircleOutlinePoints = (
   centerX: number,
   centerY: number,
   radius: number,
-): Array<Pos2D> => {
-  const points: Array<Pos2D> = []
+): Array<Pos> => {
+  const points: Array<Pos> = []
   const pointSet = new Set<string>()
 
   const addPoint = (x: number, y: number) => {
@@ -74,8 +82,8 @@ export const getCircleOutlinePoints = (
   return points
 }
 
-export const getLinePixels = (start: Pos2D, end: Pos2D): Array<Pos2D> => {
-  const pixels: Array<Pos2D> = []
+export const getLinePoints = (start: Pos, end: Pos): Array<Pos> => {
+  const pixels: Array<Pos> = []
 
   let x0 = start.x
   let y0 = start.y
@@ -106,4 +114,13 @@ export const getLinePixels = (start: Pos2D, end: Pos2D): Array<Pos2D> => {
   }
 
   return pixels
+}
+
+// Only use when performance isn't required!
+export const forWholeScreen = (callback: (x: number, y: number) => void) => {
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      callback(x, y)
+    }
+  }
 }
