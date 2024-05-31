@@ -17,3 +17,6 @@ export const invertHex = (input: Rgb): number => {
   // Convert the result hex string back to a number
   return Number.parseInt(resultHex, 16)
 }
+
+export const isValidColor = (color: Rgb): boolean =>
+  /^#[0-9A-F]{6}$/i.test(color)

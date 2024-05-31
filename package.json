@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc && vite build --minify=false",
-    "dev": "vite",
+    "dev": "concurrently -c blue,green -n tsw,vite \"bun tsw --preserveWatchOutput\" \"vite\"",
     "format": "biome check --apply-unsafe . && eslint --fix . package.json",
     "format:check": "biome check . && eslint . package.json",
     "pre-commit": "bun format && bun test && git add -A",
@@ -28,6 +28,7 @@
     "acorn": "^8.11.3",
     "acorn-walk": "^8.3.2",
     "babel-plugin-inline-functions": "^1.0.1",
+    "concurrently": "^8.2.2",
     "eslint-config-gev": "^4.5.1",
     "husky": "^9.0.11",
     "magic-string": "^0.30.10",

@@ -1,12 +1,7 @@
-import { height, width } from "./consts"
-
-export interface Pos {
-  x: number
-  y: number
-}
+import { sandboxHeight, sandboxWidth } from "./consts"
 
 export const isInBounds = (x: number, y: number) =>
-  x >= 0 && y >= 0 && x < width && y < height
+  x >= 0 && y >= 0 && x < sandboxWidth && y < sandboxHeight
 
 export const getCirclePoints = ({
   x,
@@ -114,8 +109,8 @@ export const getLinePoints = (start: Pos, end: Pos): Array<Pos> => {
 
 // Only use when performance isn't required!
 export const forWholeScreen = (callback: (x: number, y: number) => void) => {
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
+  for (let x = 0; x < sandboxWidth; x++) {
+    for (let y = 0; y < sandboxHeight; y++) {
       callback(x, y)
     }
   }

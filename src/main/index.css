@@ -25,4 +25,10 @@ body {
 
 canvas {
   image-rendering: pixelated;
+   /* Firefox */
+  /* image-rendering: -moz-crisp-edges; */
+  /* Safari */
+  /* image-rendering: -webkit-optimize-contrast; */
+  /* Safari and Chrome */
+  /* image-rendering: crisp-edges; */
 }

@@ -1,5 +1,4 @@
-import { linkedParticles } from "../Particle"
-import { canvas, width } from "./consts"
+import { numberParticles } from "../../Sandbox/Particle"
 
 // const maxFps = 400
 // const targetFrameDuration = (1000 / maxFps) * 0.9
@@ -12,10 +11,10 @@ export const Fps = {
   update: () => {
     updateFps()
   },
-  draw: () => {
-    drawFps()
+  draw: (ctx: CanvasRenderingContext2D) => {
+    drawFps(ctx)
   },
-  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 0,
+  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 100,
 }
 
 const updateFps = () => {
@@ -30,14 +29,14 @@ const updateFps = () => {
 const getAverageFps = () =>
   fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length
 
-const drawFps = () => {
+const drawFps = (ctx: CanvasRenderingContext2D) => {
   const averageFps = getAverageFps()
 
   const values = [
     `FPS ${averageFps.toFixed(0)}`,
     `Draw ${benchmarkData["draw"]!.average.toFixed(1)}ms`,
     `Upda ${benchmarkData["update"]!.average.toFixed(1)}ms`,
-    `Count ${linkedParticles.size}`,
+    `Count ${numberParticles()}`,
   ]
 
   const maxLen = values.reduce((a, b) => (b.length > a ? b.length : a), 0)
@@ -48,20 +47,24 @@ const drawFps = () => {
 
   //
   ;["#ffffff", "#000000"].forEach((color, i) => {
-    canvas.fillStyle = color
-    canvas.fillRect(
-      width - i,
+    ctx.fillStyle = color
+    ctx.fillRect(
+      ctx.canvas.width - i,
       i,
       -(textWidth + padding * 2 - i * 2),
       textHeight * values.length + padding * 2 - i * 2,
     )
   })
 
-  canvas.fillStyle = "white"
-  canvas.font = "3px 'Press Start 2P'"
-  canvas.textAlign = "right"
+  ctx.fillStyle = "white"
+  ctx.font = "3px 'Press Start 2P'"
+  ctx.textAlign = "right"
   values.forEach((value, i) =>
-    canvas.fillText(value, width - padding, textHeight * (i + 1) + padding),
+    ctx.fillText(
+      value,
+      ctx.canvas.width - padding,
+      textHeight * (i + 1) + padding,
+    ),
   )
 }
 
@@ -82,22 +85,19 @@ export const benchmark = (identifier: string, end?: true) => {
     average: 0,
     index: 0,
   })
-  const records = benchmark.records
 
   if (!end) {
-    records[benchmark.index] = { start: performance.now() }
+    benchmark.records[benchmark.index] = { start: performance.now() }
+  } else {
+    const record = benchmark.records[benchmark.index]
 
-    return
+    if (!record?.start) throw new Error('benchmark "start" not set!')
+
+    record.delta = performance.now() - record.start
+    benchmark.index = (benchmark.index + 1) % maxHistorySize
+
+    benchmark.average =
+      benchmark.records.reduce((sum, record) => sum + (record.delta ?? 0), 0) /
+      benchmark.records.length
   }
-
-  const record = records[benchmark.index]
-
-  if (!record?.start) throw new Error('benchmark "start" not set!')
-
-  record.delta = performance.now() - record.start
-  benchmark.index = (benchmark.index + 1) % maxHistorySize
-
-  benchmark.average =
-    records.reduce((sum, record) => sum + (record.delta ?? 0), 0) /
-    records.length
 }
