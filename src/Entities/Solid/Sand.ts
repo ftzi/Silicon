@@ -11,7 +11,7 @@ export const Sand = new SolidEntity({
   thermalConductivity: 0.25,
 })
 
-Sand.updatePosition = (particle: Particle) => {
+Sand.update = (particle: Particle) => {
   if (commonGravity(particle)) return
 
   if (Math.random() > 0.5) {

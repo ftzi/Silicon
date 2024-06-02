@@ -11,3 +11,5 @@ export const backgroundColor: HexColor = "#202020"
 export const invertedBackgroundColor = getInvertedHexColor(backgroundColor)
 
 export const ambientTemperature = 23
+export const maxTemp = 9999
+export const minTemp = -270

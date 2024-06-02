@@ -7,7 +7,7 @@ import {
 } from "../Entity"
 
 export class SolidEntity extends Entity {
-  updatePosition(particle: Particle) {
+  update(particle: Particle) {
     if (commonGravity(particle)) return
   }
 

@@ -1,6 +1,8 @@
 import type { Entity } from "../Entities/Entity"
 import {
   ambientTemperature,
+  maxTemp,
+  minTemp,
   sandboxHeight,
   sandboxWidth,
 } from "../common/consts"
@@ -28,7 +30,12 @@ export class Particle {
   public invertedHexColor: number
 
   public setColor(color: HexColor) {
-    this.invertedHexColor = getInvertedHexColor(color)
+    const newColor = getInvertedHexColor(color)
+
+    if (newColor !== this.invertedHexColor) {
+      this.invertedHexColor = getInvertedHexColor(color)
+      addToDrawOrder(this.x, this.y)
+    }
   }
 
   private constructor(
@@ -113,7 +120,12 @@ export class Particle {
 
   updateTemperature() {
     this.temperature -= (this.temperature - ambientTemperature) * 0.000025
-    ;[this.top, this.bottom, this.left, this.right].forEach((neighbor) => {
+    ;[
+      matrixParticles[this.x]?.[this.y - 1],
+      matrixParticles[this.x]?.[this.y + 1],
+      matrixParticles[this.x - 1]?.[this.y],
+      matrixParticles[this.x + 1]?.[this.y],
+    ].forEach((neighbor) => {
       if (neighbor && neighbor.temperature < this.temperature) {
         const temperatureDifference = this.temperature - neighbor.temperature
         const heatTransferRate =
@@ -127,15 +139,12 @@ export class Particle {
         const neighborHeatChange =
           heatTransfer / neighbor.entity.volumetricHeatCapacity
 
-        console.log(
-          thisHeatChange,
-          neighborHeatChange,
-          this.entity.volumetricHeatCapacity,
-          neighbor.entity.volumetricHeatCapacity,
-        )
         // Transfer heat
-        this.temperature -= thisHeatChange
-        neighbor.temperature += neighborHeatChange
+        this.temperature = Math.max(this.temperature - thisHeatChange, minTemp)
+        neighbor.temperature = Math.min(
+          neighbor.temperature + neighborHeatChange,
+          maxTemp,
+        )
       }
     })
   }
@@ -192,7 +201,7 @@ const updateParticles = () => {
 
     node = fromHead ? node.next : node.prev
 
-    particle.entity.updatePosition(particle)
+    particle.entity.update(particle)
     particle.updateTemperature()
     particle.entity.extraUpdate?.(particle)
   }

@@ -59,7 +59,7 @@ export class Entity {
     this.thermalConductivity = props.thermalConductivity
   }
 
-  updatePosition(particle: Particle) {
+  update(particle: Particle) {
     if (commonGravity(particle)) return
   }
 

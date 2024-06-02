@@ -33,7 +33,7 @@ export class LiquidEntity extends Entity {
     super({ ...props, state: State.Liquid })
   }
 
-  updatePosition(particle: Particle) {
+  update(particle: Particle) {
     if (commonGravity(particle)) return
 
     const top = particle.top

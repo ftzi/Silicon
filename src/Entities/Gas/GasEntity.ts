@@ -27,7 +27,7 @@ export class GasEntity extends Entity {
     super({ ...props, state: State.Gas })
   }
 
-  updatePosition(particle: Particle) {
+  update(particle: Particle) {
     const top = particle.top
 
     if (!top && particle.y > 0) {
