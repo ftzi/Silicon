@@ -1,9 +1,9 @@
-import { scale } from "./utils/consts"
-
 type WhenMouseDown = (props: {
   pos: Pos
   draggingFrom: Pos | undefined
 }) => void
+
+type OnMouseDown = (pos: Pos) => void
 
 export class Mouse {
   private isMouseLeftDown = false
@@ -13,19 +13,23 @@ export class Mouse {
 
   pos: Pos | undefined = undefined
 
-  private whenMouseLeftDown: WhenMouseDown
-  private whenMouseRightDown: WhenMouseDown
+  /** Runs on every update. */
+  public whenMouseLeftDown?: WhenMouseDown
+  /** Runs on every update. */
+  public whenMouseRightDown?: WhenMouseDown
+
+  public onMouseLeftDown?: OnMouseDown
+  public onMouseRightDown?: OnMouseDown
+  public onMouseMove?: (pos: Pos | undefined) => void
+
   // private onMousePosChange: ((pos: Pos | undefined) => void) | undefined
   private canvas: HTMLCanvasElement
+  private ctx: Ctx
 
   constructor(props: {
-    whenMouseLeftDown: WhenMouseDown
-    whenMouseRightDown: WhenMouseDown
-    // onMousePosChange: (pos: Pos | undefined) => void
-    ctx: CanvasRenderingContext2D
+    ctx: Ctx
   }) {
-    this.whenMouseLeftDown = props.whenMouseLeftDown
-    this.whenMouseRightDown = props.whenMouseRightDown
+    this.ctx = props.ctx
     this.canvas = props.ctx.canvas
     this.setup()
   }
@@ -38,14 +42,14 @@ export class Mouse {
     if (!this.pos) return
 
     if (this.isMouseLeftDown) {
-      this.whenMouseLeftDown({
+      this.whenMouseLeftDown?.({
         pos: this.pos,
         draggingFrom: this.draggingLeftFrom,
       })
       this.draggingLeftFrom = this.pos
     }
     if (this.isMouseRightDown) {
-      this.whenMouseRightDown({
+      this.whenMouseRightDown?.({
         pos: this.pos,
         draggingFrom: this.draggingRightFrom,
       })
@@ -57,23 +61,36 @@ export class Mouse {
     const rect = this.canvas.getBoundingClientRect()
 
     return {
-      x: Math.floor((event.clientX - rect.left) / scale),
-      y: Math.floor((event.clientY - rect.top) / scale),
+      x: Math.floor((event.clientX - rect.left) / this.ctx.currentScale),
+      y: Math.floor((event.clientY - rect.top) / this.ctx.currentScale),
     }
   }
 
   private setup = () => {
     this.canvas.addEventListener("mousemove", (event) => {
       this.pos = this.getMousePos(event)
+      this.onMouseMove?.(this.pos)
     })
 
     this.canvas.addEventListener("mouseleave", () => {
       this.pos = undefined
+      this.onMouseMove?.(this.pos)
     })
 
     this.canvas.addEventListener("mousedown", (event) => {
-      if (event.button === 0) this.isMouseLeftDown = true
-      if (event.button === 2) this.isMouseRightDown = true
+      this.pos = this.getMousePos(event)
+
+      if (event.button === 0) {
+        this.onMouseLeftDown?.(this.pos)
+        this.isMouseLeftDown = true
+      }
+
+      if (event.button === 2) {
+        if (this.isMouseRightDown) {
+          this.onMouseRightDown?.(this.pos)
+        }
+        this.isMouseRightDown = true
+      }
     })
 
     document.addEventListener("mouseup", (event) => {

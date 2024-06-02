@@ -1,10 +1,11 @@
-import { canvasSetup } from "../common/canvas"
-import { getSandboxMouse } from "./Mouse"
 import { Particles } from "./Particle"
+import { getSandboxMouse } from "./SandboxMouse"
 import { getParticlesDraw } from "./particlesDraw"
 
 export const getSandbox = ({ ctx }: CtxObj) => {
-  canvasSetup({ ctx })
+  ctx.canvas.style.cursor = "none"
+
+  Particles.setup()
   const mouse = getSandboxMouse({ ctx })
   const particlesDraw = getParticlesDraw({ ctx })
 

@@ -12,7 +12,8 @@
         "useLiteralKeys": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "noInferrableTypes": "off"
       }
     },
     "ignore": ["package.json", "dist"]

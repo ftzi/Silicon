@@ -1,7 +1,19 @@
-import { sandboxHeight, sandboxWidth } from "./consts"
+import { sandboxHeight, sandboxWidth } from "../consts"
 
 export const isInBounds = (x: number, y: number) =>
   x >= 0 && y >= 0 && x < sandboxWidth && y < sandboxHeight
+
+type Rect = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+export const isPosInRect = (pos: Pos, rect: Rect) =>
+  pos.x >= rect.x &&
+  pos.x < rect.x + rect.width &&
+  pos.y >= rect.y &&
+  pos.y < rect.y + rect.height
 
 export const getCirclePoints = ({
   x,

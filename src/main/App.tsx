@@ -1,11 +1,12 @@
 import React from "react"
+import { setupCanvas } from "../common/canvas"
 import {
   sandboxHeight,
+  sandboxScale,
   sandboxWidth,
-  scale,
   toolboxHeight,
   toolboxWidth,
-} from "../common/utils/consts"
+} from "../common/consts"
 import { start } from "./main"
 
 let didRun = false
@@ -18,8 +19,11 @@ export const App = React.memo(() => {
     if (!didRun) {
       didRun = true
       start({
-        ctxSandbox: sandboxRef.current!.getContext("2d")!,
-        ctxToolbox: toolboxRef.current!.getContext("2d")!,
+        ctxSandbox: setupCanvas({
+          ctx: sandboxRef.current!.getContext("2d")!,
+          scale: sandboxScale,
+        }),
+        ctxToolbox: setupCanvas({ ctx: toolboxRef.current!.getContext("2d")! }),
       })
     }
   }, [])
@@ -28,14 +32,14 @@ export const App = React.memo(() => {
     <div>
       <canvas
         ref={sandboxRef}
-        width={sandboxWidth * scale}
-        height={sandboxHeight * scale}
+        width={sandboxWidth * sandboxScale}
+        height={sandboxHeight * sandboxScale}
         style={{ border: "1px solid black" }}
       />
       <canvas
         ref={toolboxRef}
-        width={toolboxWidth * scale}
-        height={toolboxHeight * scale}
+        width={toolboxWidth}
+        height={toolboxHeight}
         style={{ border: "1px solid black" }}
       />
     </div>

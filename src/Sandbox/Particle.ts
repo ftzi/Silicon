@@ -1,5 +1,6 @@
 import type { Entity } from "../Entities/Entity"
-import { sandboxHeight, sandboxWidth } from "../common/utils/consts"
+import { sandboxHeight, sandboxWidth } from "../common/consts"
+import { data, incrementSimulationI, simulationI } from "../common/data"
 import { benchmark } from "../common/utils/fps"
 import { LinkedList, type LinkedListItem } from "../common/utils/linkedList"
 import { isInBounds } from "../common/utils/points"
@@ -17,7 +18,7 @@ export const particleAtSafe = (x: number, y: number): Particle | undefined =>
 
 export class Particle {
   private node: LinkedListItem<Particle> = linkedParticles.append(this)
-  public readonly seed: number = Math.random()
+  public swappedAt = -1
 
   private constructor(
     public x: number,
@@ -76,6 +77,9 @@ export class Particle {
     matrixParticles[this.x]![this.y] = this
     matrixParticles[withParticle.x]![withParticle.y] = withParticle
 
+    this.swappedAt = simulationI
+    withParticle.swappedAt = simulationI
+
     addToDrawOrder(this.x, this.y)
     addToDrawOrder(withParticle.x, withParticle.y)
   }
@@ -87,7 +91,7 @@ export class Particle {
   }
 
   get left() {
-    return matrixParticles[this.x]?.[this.y]
+    return matrixParticles[this.x - 1]?.[this.y]
   }
 
   get right() {
@@ -111,34 +115,6 @@ export class Particle {
   }
 }
 
-export const checkLeft = (particle: Particle): boolean => {
-  if (
-    !particle.bottomLeft &&
-    particle.x > 0 &&
-    particle.y < sandboxHeight - 1
-  ) {
-    particle.moveToAdd(-1, 1)
-
-    return true
-  }
-
-  return false
-}
-
-export const checkRight = (particle: Particle): boolean => {
-  if (
-    !particle.bottomRight &&
-    particle.x < sandboxWidth - 1 &&
-    particle.y < sandboxHeight - 1
-  ) {
-    particle.moveToAdd(1, 1)
-
-    return true
-  }
-
-  return false
-}
-
 const setupMatrixParticles = () => {
   for (let x = 0; x < sandboxWidth; x++)
     matrixParticles[x] = new Array<undefined>(sandboxHeight).fill(undefined)
@@ -147,17 +123,9 @@ const setupMatrixParticles = () => {
 export const Particles = {
   setup: () => {
     setupMatrixParticles()
-    // forWholeScreen((x, y) =>
-    //   Particle.create({
-    //     x,
-    //     y,
-    //     entity: Entities.Sand,
-    //     replace: true,
-    //   }),
-    // )
   },
   update: () => {
-    updateParticles()
+    if (data.running) updateParticles()
   },
 }
 
@@ -174,26 +142,10 @@ const updateParticles = () => {
 
     node = fromHead ? node.next : node.prev
 
-    if (particle.y < sandboxHeight - 1) {
-      const bottom = particle.bottom
-
-      if (!bottom) {
-        particle.moveToAdd(0, 1)
-        continue
-      }
-      if (bottom.entity.density < particle.entity.density) {
-        particle.swap(bottom)
-        continue
-      }
-    }
-
-    if (particle.seed > 0.5) {
-      checkLeft(particle) || checkRight(particle)
-    } else {
-      checkRight(particle) || checkLeft(particle)
-    }
+    particle.entity.update(particle)
   }
 
+  incrementSimulationI()
   // Else, don't move.
   benchmark("update", true)
 }

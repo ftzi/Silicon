@@ -7,7 +7,13 @@ declare global {
     y: number
   }
 
+  export type Ctx = CanvasRenderingContext2D & {
+    logicWidth: number
+    logicHeight: number
+    currentScale: number
+  }
+
   export type CtxObj = {
-    ctx: CanvasRenderingContext2D
+    ctx: Ctx
   }
 }

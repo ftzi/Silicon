@@ -11,10 +11,10 @@ export const Fps = {
   update: () => {
     updateFps()
   },
-  draw: (ctx: CanvasRenderingContext2D) => {
+  draw: (ctx: Ctx) => {
     drawFps(ctx)
   },
-  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 100,
+  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 10,
 }
 
 const updateFps = () => {
@@ -29,43 +29,54 @@ const updateFps = () => {
 const getAverageFps = () =>
   fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length
 
-const drawFps = (ctx: CanvasRenderingContext2D) => {
+const drawFps = (ctx: Ctx) => {
   const averageFps = getAverageFps()
 
   const values = [
-    `FPS ${averageFps.toFixed(0)}`,
-    `Draw ${benchmarkData["draw"]!.average.toFixed(1)}ms`,
-    `Upda ${benchmarkData["update"]!.average.toFixed(1)}ms`,
-    `Count ${numberParticles()}`,
+    ["FPS ", averageFps.toFixed(0)],
+    ["Draw ", `${benchmarkData["draw"]!.average.toFixed(1)}ms`],
+    ["Update ", `${benchmarkData["update"]!.average.toFixed(1)}ms`],
+    ["Count ", `${numberParticles()}`],
   ]
 
-  const maxLen = values.reduce((a, b) => (b.length > a ? b.length : a), 0)
+  const padding = 8
+  const linePadding = 4
+  const textHeight = 10
 
-  const textWidth = Math.floor(maxLen * 3)
-  const textHeight = 4
-  const padding = 3
+  const height =
+    padding * 2 +
+    values.length * textHeight +
+    (values.length - 1) * linePadding -
+    1
 
-  //
-  ;["#ffffff", "#000000"].forEach((color, i) => {
-    ctx.fillStyle = color
-    ctx.fillRect(
-      ctx.canvas.width - i,
-      i,
-      -(textWidth + padding * 2 - i * 2),
-      textHeight * values.length + padding * 2 - i * 2,
-    )
+  const logoHeight = 30
+  const x = 0
+  const y = ctx.canvas.height / ctx.currentScale - height - logoHeight
+
+  ctx.fillStyle = "#ffffff"
+  ctx.fillRect(x, y, ctx.logicWidth, 1)
+
+  const getTextY = (i: number) => y + padding + textHeight * i + i * linePadding
+
+  ctx.font = `${textHeight}px 'Press Start 2P'`
+  values.forEach((value, i) => {
+    const textY = getTextY(i)
+
+    ctx.textAlign = "left"
+    ctx.fillText(value[0]!, padding, textY)
+
+    ctx.textAlign = "right"
+    ctx.fillText(value[1]!, ctx.logicWidth - padding, textY)
   })
 
-  ctx.fillStyle = "white"
-  ctx.font = "3px 'Press Start 2P'"
-  ctx.textAlign = "right"
-  values.forEach((value, i) =>
-    ctx.fillText(
-      value,
-      ctx.canvas.width - padding,
-      textHeight * (i + 1) + padding,
-    ),
-  )
+  ctx.fillStyle = "#ffffff"
+  const logoY = y + height + 2
+
+  ctx.fillRect(x, logoY, ctx.logicWidth, 1)
+  ctx.textAlign = "center"
+  ctx.textBaseline = "top"
+  ctx.font = `${textHeight + 3}px 'Press Start 2P'`
+  ctx.fillText("SILICON", ctx.logicWidth / 2, logoY + 9)
 }
 
 type BenchmarkRecord = {

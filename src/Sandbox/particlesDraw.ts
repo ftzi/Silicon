@@ -1,4 +1,4 @@
-import { invertedBackgroundColor } from "../common/utils/consts"
+import { invertedBackgroundColor } from "../common/consts"
 import { particleAt } from "./Particle"
 
 const drawOrdersArrayX: Array<number> = []

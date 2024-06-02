@@ -1,6 +1,6 @@
-import { Entities } from "../Entities/Entities"
 import type { Entity } from "../Entities/Entity"
-import { Mouse } from "../common/mouse"
+import { Mouse } from "../common/Mouse"
+import { data } from "../common/data"
 import {
   getCircleOutlinePoints,
   getCirclePoints,
@@ -34,23 +34,22 @@ const onMouseDown = (props: {
 }
 
 export const getSandboxMouse = ({ ctx }: CtxObj) => {
-  const mouse = new Mouse({
-    ctx,
-    whenMouseLeftDown: ({ pos, draggingFrom }) => {
-      onMouseDown({
-        pos,
-        entity: Entities.Sand,
-        draggingFrom,
-      })
-    },
-    whenMouseRightDown: ({ pos, draggingFrom }) => {
-      onMouseDown({
-        pos,
-        entity: Entities.Water,
-        draggingFrom,
-      })
-    },
-  })
+  const mouse = new Mouse({ ctx })
+
+  mouse.whenMouseLeftDown = ({ pos, draggingFrom }) => {
+    onMouseDown({
+      pos,
+      entity: data.left,
+      draggingFrom,
+    })
+  }
+  mouse.whenMouseRightDown = ({ pos, draggingFrom }) => {
+    onMouseDown({
+      pos,
+      entity: data.right,
+      draggingFrom,
+    })
+  }
 
   const drawMousePosition = () => {
     if (!mouse.pos) return
