@@ -86,9 +86,7 @@ export class Mouse {
       }
 
       if (event.button === 2) {
-        if (this.isMouseRightDown) {
-          this.onMouseRightDown?.(this.pos)
-        }
+        this.onMouseRightDown?.(this.pos)
         this.isMouseRightDown = true
       }
     })

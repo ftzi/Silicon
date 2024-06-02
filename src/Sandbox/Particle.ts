@@ -1,6 +1,11 @@
 import type { Entity } from "../Entities/Entity"
-import { sandboxHeight, sandboxWidth } from "../common/consts"
+import {
+  ambientTemperature,
+  sandboxHeight,
+  sandboxWidth,
+} from "../common/consts"
 import { data, incrementSimulationI, simulationI } from "../common/data"
+import { getInvertedHexColor } from "../common/utils/color"
 import { benchmark } from "../common/utils/fps"
 import { LinkedList, type LinkedListItem } from "../common/utils/linkedList"
 import { isInBounds } from "../common/utils/points"
@@ -19,12 +24,26 @@ export const particleAtSafe = (x: number, y: number): Particle | undefined =>
 export class Particle {
   private node: LinkedListItem<Particle> = linkedParticles.append(this)
   public swappedAt = -1
+  public temperature: number = 23
+  public invertedHexColor: number
+
+  public setColor(color: HexColor) {
+    this.invertedHexColor = getInvertedHexColor(color)
+  }
 
   private constructor(
     public x: number,
     public y: number,
-    public entity: Entity,
-  ) {}
+    public readonly entity: Entity,
+  ) {
+    this.invertedHexColor = entity.invertedHexColor
+    this.temperature = entity.initialTemperature
+  }
+
+  public convertTo(entity: Entity) {
+    ;(this.entity satisfies Entity) = entity
+    this.invertedHexColor = entity.invertedHexColor
+  }
 
   public static create({
     x,
@@ -39,9 +58,8 @@ export class Particle {
         if (!replace || entity === particleAtPos.entity) return
         particleAtPos.remove()
       }
-      const particle = new Particle(x, y, entity)
 
-      matrixParticles[x]![y] = particle
+      matrixParticles[x]![y] = new Particle(x, y, entity)
       addToDrawOrder(x, y)
     }
   }
@@ -88,6 +106,38 @@ export class Particle {
     matrixParticles[this.x]![this.y] = undefined
     this.node.remove()
     addToDrawOrder(this.x, this.y)
+  }
+
+  public temperatureCapacity = 1
+  public temperatureTransfer = 1
+
+  updateTemperature() {
+    this.temperature -= (this.temperature - ambientTemperature) * 0.000025
+    ;[this.top, this.bottom, this.left, this.right].forEach((neighbor) => {
+      if (neighbor && neighbor.temperature < this.temperature) {
+        const temperatureDifference = this.temperature - neighbor.temperature
+        const heatTransferRate =
+          (this.entity.thermalConductivity +
+            neighbor.entity.thermalConductivity) /
+          2
+        const heatTransfer = temperatureDifference * heatTransferRate
+
+        // Adjust temperature changes based on volumetric heat capacity
+        const thisHeatChange = heatTransfer / this.entity.volumetricHeatCapacity
+        const neighborHeatChange =
+          heatTransfer / neighbor.entity.volumetricHeatCapacity
+
+        console.log(
+          thisHeatChange,
+          neighborHeatChange,
+          this.entity.volumetricHeatCapacity,
+          neighbor.entity.volumetricHeatCapacity,
+        )
+        // Transfer heat
+        this.temperature -= thisHeatChange
+        neighbor.temperature += neighborHeatChange
+      }
+    })
   }
 
   get left() {
@@ -142,7 +192,9 @@ const updateParticles = () => {
 
     node = fromHead ? node.next : node.prev
 
-    particle.entity.update(particle)
+    particle.entity.updatePosition(particle)
+    particle.updateTemperature()
+    particle.entity.extraUpdate?.(particle)
   }
 
   incrementSimulationI()

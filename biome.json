@@ -13,7 +13,8 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noInferrableTypes": "off"
+        "noInferrableTypes": "off",
+        "useEnumInitializers": "off"
       }
     },
     "ignore": ["package.json", "dist"]

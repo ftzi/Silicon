@@ -63,6 +63,7 @@ export const getSandboxMouse = ({ ctx }: CtxObj) => {
   }
 
   return {
+    mouse,
     update: () => {
       mouse.update()
     },

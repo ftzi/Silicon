@@ -1,4 +1,5 @@
-import { numberParticles } from "../../Sandbox/Particle"
+import { numberParticles, particleAtSafe } from "../../Sandbox/Particle"
+import { sandboxMouse } from "../../Sandbox/Sandbox"
 
 // const maxFps = 400
 // const targetFrameDuration = (1000 / maxFps) * 0.9
@@ -14,7 +15,7 @@ export const Fps = {
   draw: (ctx: Ctx) => {
     drawFps(ctx)
   },
-  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 10,
+  shouldLoop: (): boolean => performance.now() - lastFrameTime >= 14,
 }
 
 const updateFps = () => {
@@ -32,11 +33,18 @@ const getAverageFps = () =>
 const drawFps = (ctx: Ctx) => {
   const averageFps = getAverageFps()
 
+  const mousePos = sandboxMouse.pos
+  const particleAtMouse = particleAtSafe(mousePos?.x ?? -1, mousePos?.y ?? -1)
   const values = [
-    ["FPS ", averageFps.toFixed(0)],
-    ["Draw ", `${benchmarkData["draw"]!.average.toFixed(1)}ms`],
-    ["Update ", `${benchmarkData["update"]!.average.toFixed(1)}ms`],
-    ["Count ", `${numberParticles()}`],
+    ["Entity", particleAtMouse?.entity.name ?? "-"],
+    [
+      "Temp",
+      particleAtMouse ? `${particleAtMouse.temperature.toFixed(1)}` : "-",
+    ],
+    ["FPS", averageFps.toFixed(0)],
+    ["Draw", `${benchmarkData["draw"]!.average.toFixed(1)}ms`],
+    ["Update", `${benchmarkData["update"]!.average.toFixed(1)}ms`],
+    ["Count", `${numberParticles()}`],
   ]
 
   const padding = 8

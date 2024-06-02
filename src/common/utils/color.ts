@@ -1,7 +1,5 @@
-export type Rgb = `#${string}`
-
 // As we use Uint32Array for the imageData, we need to convert the hex color from '#AABBCC' to 0xFFCCBBAA.
-export const invertHex = (input: Rgb): number => {
+export const getInvertedHexColor = (input: HexColor): number => {
   // Invert the order
   const invertedHex =
     input
@@ -18,5 +16,5 @@ export const invertHex = (input: Rgb): number => {
   return Number.parseInt(resultHex, 16)
 }
 
-export const isValidColor = (color: Rgb): boolean =>
+export const isValidColor = (color: HexColor): boolean =>
   /^#[0-9A-F]{6}$/i.test(color)

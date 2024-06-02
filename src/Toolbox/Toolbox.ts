@@ -18,7 +18,7 @@ export const getToolbox = ({ ctx }: CtxObj) => {
   })
 
   let prevButton: EntityButton | undefined
-  const entitiesButtons = Object.values(Entities).map((entity) => {
+  const entitiesButtons = [...Object.values(Entities)].map((entity) => {
     prevButton = new EntityButton({
       ctx,
       x,

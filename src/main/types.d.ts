@@ -7,6 +7,8 @@ declare global {
     y: number
   }
 
+  export type HexColor = `#${string}`
+
   export type Ctx = CanvasRenderingContext2D & {
     logicWidth: number
     logicHeight: number
@@ -16,4 +18,6 @@ declare global {
   export type CtxObj = {
     ctx: Ctx
   }
+
+  type OmitKey<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 }

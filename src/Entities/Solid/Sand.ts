@@ -1,14 +1,17 @@
-import type { Particle } from "../Sandbox/Particle"
-import { sandboxHeight, sandboxWidth } from "../common/consts"
-import { Entity, commonGravity } from "./Entity"
+import type { Particle } from "../../Sandbox/Particle"
+import { sandboxHeight, sandboxWidth } from "../../common/consts"
+import { commonGravity } from "../Entity"
+import { SolidEntity } from "./SolidEntity"
 
-export const Sand = new Entity({
+export const Sand = new SolidEntity({
   name: "Sand",
   rgb: "#d2b48c",
-  density: 2,
+  density: 1.6,
+  heatCapacity: 0.83,
+  thermalConductivity: 0.25,
 })
 
-Sand.update = (particle: Particle) => {
+Sand.updatePosition = (particle: Particle) => {
   if (commonGravity(particle)) return
 
   if (Math.random() > 0.5) {

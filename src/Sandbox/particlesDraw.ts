@@ -29,7 +29,7 @@ export const getParticlesDraw = ({ ctx }: CtxObj) => {
       const y = drawOrdersArrayY[i]!
 
       imageDataArray[y * imageData.width + x] =
-        particleAt(x, y)?.entity.invertedRgb ?? invertedBackgroundColor
+        particleAt(x, y)?.invertedHexColor ?? invertedBackgroundColor
     }
     drawOrderI = 0
 
