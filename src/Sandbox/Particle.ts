@@ -1,11 +1,5 @@
 import type { Entity } from "../Entities/Entity"
-import {
-  ambientTemperature,
-  maxTemp,
-  minTemp,
-  sandboxHeight,
-  sandboxWidth,
-} from "../common/consts"
+import { sandboxHeight, sandboxWidth } from "../common/consts"
 import { data, incrementSimulationI, simulationI } from "../common/data"
 import { getInvertedHexColor } from "../common/utils/color"
 import { benchmark } from "../common/utils/fps"
@@ -46,7 +40,6 @@ export class Particle {
     public readonly entity: Entity,
   ) {
     this.invertedHexColor = entity.invertedHexColor
-    this.temperature = entity.initialTemperature
   }
 
   public convertTo(entity: Entity) {
@@ -121,50 +114,6 @@ export class Particle {
   public temperatureCapacity = 1
   public temperatureTransfer = 1
 
-  updateTemperature() {
-    let thisTempTemperature =
-      this.temperature - (this.temperature - ambientTemperature) * 0.000025
-
-    //
-    ;[
-      matrixParticles[this.x]?.[this.y - 1],
-      matrixParticles[this.x]?.[this.y + 1],
-      matrixParticles[this.x - 1]?.[this.y],
-      matrixParticles[this.x + 1]?.[this.y],
-    ].forEach((neighbor) => {
-      if (!neighbor) return
-
-      const neighborTemperature =
-        neighbor.nextTemperature ?? neighbor.temperature
-
-      if (thisTempTemperature > neighborTemperature) {
-        const heatTransferred =
-          ((thisTempTemperature - neighborTemperature) *
-            (this.entity.thermalConductivity +
-              neighbor.entity.thermalConductivity)) /
-          2
-
-        thisTempTemperature = Math.max(
-          (this.entity.heatCapacity * thisTempTemperature - heatTransferred) /
-            this.entity.heatCapacity,
-          minTemp,
-        )
-
-        neighbor.nextTemperature = Math.min(
-          (neighbor.entity.heatCapacity * neighborTemperature +
-            heatTransferred) /
-            neighbor.entity.heatCapacity,
-          maxTemp,
-        )
-
-        if (neighbor.updateNextTempAtI === Number.POSITIVE_INFINITY)
-          neighbor.updateNextTempAtI = simulationI + 1
-      }
-    })
-
-    this.nextTemperature = thisTempTemperature
-  }
-
   get left() {
     return matrixParticles[this.x - 1]?.[this.y]
   }
@@ -232,7 +181,6 @@ const updateParticles = () => {
       particle.nextTemperature = undefined
     }
     particle.entity.update(particle)
-    particle.updateTemperature()
     particle.entity.extraUpdate?.(particle)
   }
 

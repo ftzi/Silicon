@@ -7,9 +7,6 @@ export const Fire = new GasEntity({
   name: "Fire",
   rgb: "#f02020",
   density: 0.0001,
-  initialTemperature: 500,
-  heatCapacity: 0.1,
-  thermalConductivity: 0.1,
 })
 
 Fire.extraUpdate = (particle) => {

@@ -6,8 +6,6 @@ export const Water = new LiquidEntity({
   rgb: "#1070ff",
   density: 1,
   viscosity: 0.1,
-  heatCapacity: 4.18,
-  thermalConductivity: 0.6,
 })
 
 Water.extraUpdate = (particle) => {

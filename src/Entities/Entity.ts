@@ -1,5 +1,5 @@
 import type { Particle } from "../Sandbox/Particle"
-import { ambientTemperature, sandboxHeight } from "../common/consts"
+import { sandboxHeight } from "../common/consts"
 import { getInvertedHexColor, isValidColor } from "../common/utils/color"
 
 export enum State {
@@ -13,13 +13,9 @@ export type EntityConstructorProps = {
   name: string
   rgb: HexColor
   density: number
-  /** 0.0 to 1.0. 0 will always move randomlyon each frame, 1 never. */
+  /** 0.0 to 1.0. 0 will always move randomly on each frame, 1 never. */
   viscosity?: number
-  /** @default 23 */
-  initialTemperature?: number
   state: State
-  heatCapacity: number
-  thermalConductivity: number
 }
 
 export class Entity {
@@ -31,9 +27,6 @@ export class Entity {
   public readonly falls: boolean
   public readonly name: string
   public readonly state: State
-  public readonly initialTemperature: number
-  public readonly heatCapacity: number
-  public readonly thermalConductivity: number
 
   constructor(props: EntityConstructorProps) {
     if (!isValidColor(props.rgb)) {
@@ -46,9 +39,6 @@ export class Entity {
     this.name = props.name
     this.state = props.state
     this.falls = [State.Solid].includes(this.state)
-    this.initialTemperature = props.initialTemperature ?? ambientTemperature
-    this.thermalConductivity = props.thermalConductivity
-    this.heatCapacity = props.heatCapacity
   }
 
   update(particle: Particle) {

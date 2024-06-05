@@ -7,8 +7,6 @@ export const Sand = new SolidEntity({
   name: "Sand",
   rgb: "#d2b48c",
   density: 1.6,
-  heatCapacity: 0.83,
-  thermalConductivity: 0.25,
 })
 
 Sand.update = (particle: Particle) => {
