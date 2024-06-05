@@ -40,6 +40,7 @@ export class LiquidEntity extends Entity {
 
     if (
       top &&
+      top.entity.state !== State.Fixed &&
       top.entity.density > particle.entity.density &&
       top.swappedAt < simulationI &&
       particle.swappedAt < simulationI &&

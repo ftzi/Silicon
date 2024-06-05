@@ -9,15 +9,15 @@ export const Fire = new GasEntity({
   density: 0.0001,
   initialTemperature: 500,
   heatCapacity: 0.1,
-  thermalConductivity: 99,
+  thermalConductivity: 0.1,
 })
 
 Fire.extraUpdate = (particle) => {
-  particle.invertedHexColor = getInvertedHexColor(Fire.getColor!())
-  if (Math.random() > 0.92) particle.remove()
+  particle.invertedHexColor = getInvertedHexColor(getColor())
+  if (Math.random() > 0.915) particle.remove()
 }
 
-Fire.getColor = () => {
+const getColor = () => {
   // Fire colors typically range from red to yellow (hue values from 0 to 60)
   const hue = getRandomInt(-5, 40) // Random hue between 0 (red) and 60 (yellow)
   const saturation = getRandomInt(90, 100) // High saturation for vivid colors

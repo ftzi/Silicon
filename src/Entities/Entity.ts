@@ -22,11 +22,6 @@ export type EntityConstructorProps = {
   thermalConductivity: number
 }
 
-const calculateVolumetricHeatCapacity = (
-  specificHeatCapacity: number,
-  density: number,
-): number => specificHeatCapacity * density
-
 export class Entity {
   /** As we use Uint32Array for the imageData, we need to convert the hex color from 0xAABBCC to 0xFFCCBBAA. */
   public readonly invertedHexColor: number
@@ -37,7 +32,7 @@ export class Entity {
   public readonly name: string
   public readonly state: State
   public readonly initialTemperature: number
-  public readonly volumetricHeatCapacity: number
+  public readonly heatCapacity: number
   public readonly thermalConductivity: number
 
   constructor(props: EntityConstructorProps) {
@@ -52,11 +47,8 @@ export class Entity {
     this.state = props.state
     this.falls = [State.Solid].includes(this.state)
     this.initialTemperature = props.initialTemperature ?? ambientTemperature
-    this.volumetricHeatCapacity = calculateVolumetricHeatCapacity(
-      props.heatCapacity,
-      props.density,
-    )
     this.thermalConductivity = props.thermalConductivity
+    this.heatCapacity = props.heatCapacity
   }
 
   update(particle: Particle) {
@@ -64,7 +56,6 @@ export class Entity {
   }
 
   extraUpdate: undefined | ((particle: Particle) => void) = undefined
-  getColor: undefined | (() => HexColor) = undefined
 }
 
 export const commonGravity = (particle: Particle): true | undefined => {

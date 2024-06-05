@@ -27,6 +27,8 @@ export class Particle {
   private node: LinkedListItem<Particle> = linkedParticles.append(this)
   public swappedAt = -1
   public temperature: number = 23
+  public nextTemperature: number | undefined
+  public updateNextTempAtI: number = Number.POSITIVE_INFINITY
   public invertedHexColor: number
 
   public setColor(color: HexColor) {
@@ -50,6 +52,7 @@ export class Particle {
   public convertTo(entity: Entity) {
     ;(this.entity satisfies Entity) = entity
     this.invertedHexColor = entity.invertedHexColor
+    addToDrawOrder(this.x, this.y)
   }
 
   public static create({
@@ -85,7 +88,7 @@ export class Particle {
       matrixParticles[this.x]![this.y] = this
       addToDrawOrder(this.x, this.y)
     } else {
-      // this.remove()
+      this.remove()
     }
   }
 
@@ -119,34 +122,47 @@ export class Particle {
   public temperatureTransfer = 1
 
   updateTemperature() {
-    this.temperature -= (this.temperature - ambientTemperature) * 0.000025
+    let thisTempTemperature =
+      this.temperature - (this.temperature - ambientTemperature) * 0.000025
+
+    //
     ;[
       matrixParticles[this.x]?.[this.y - 1],
       matrixParticles[this.x]?.[this.y + 1],
       matrixParticles[this.x - 1]?.[this.y],
       matrixParticles[this.x + 1]?.[this.y],
     ].forEach((neighbor) => {
-      if (neighbor && neighbor.temperature < this.temperature) {
-        const temperatureDifference = this.temperature - neighbor.temperature
-        const heatTransferRate =
-          (this.entity.thermalConductivity +
-            neighbor.entity.thermalConductivity) /
+      if (!neighbor) return
+
+      const neighborTemperature =
+        neighbor.nextTemperature ?? neighbor.temperature
+
+      if (thisTempTemperature > neighborTemperature) {
+        const heatTransferred =
+          ((thisTempTemperature - neighborTemperature) *
+            (this.entity.thermalConductivity +
+              neighbor.entity.thermalConductivity)) /
           2
-        const heatTransfer = temperatureDifference * heatTransferRate
 
-        // Adjust temperature changes based on volumetric heat capacity
-        const thisHeatChange = heatTransfer / this.entity.volumetricHeatCapacity
-        const neighborHeatChange =
-          heatTransfer / neighbor.entity.volumetricHeatCapacity
+        thisTempTemperature = Math.max(
+          (this.entity.heatCapacity * thisTempTemperature - heatTransferred) /
+            this.entity.heatCapacity,
+          minTemp,
+        )
 
-        // Transfer heat
-        this.temperature = Math.max(this.temperature - thisHeatChange, minTemp)
-        neighbor.temperature = Math.min(
-          neighbor.temperature + neighborHeatChange,
+        neighbor.nextTemperature = Math.min(
+          (neighbor.entity.heatCapacity * neighborTemperature +
+            heatTransferred) /
+            neighbor.entity.heatCapacity,
           maxTemp,
         )
+
+        if (neighbor.updateNextTempAtI === Number.POSITIVE_INFINITY)
+          neighbor.updateNextTempAtI = simulationI + 1
       }
     })
+
+    this.nextTemperature = thisTempTemperature
   }
 
   get left() {
@@ -184,7 +200,13 @@ export const Particles = {
     setupMatrixParticles()
   },
   update: () => {
-    if (data.running) updateParticles()
+    if (data.running) {
+      if (data.step) {
+        data.running = false
+        data.step = false
+      }
+      updateParticles()
+    }
   },
 }
 
@@ -201,12 +223,19 @@ const updateParticles = () => {
 
     node = fromHead ? node.next : node.prev
 
+    if (
+      particle.nextTemperature !== undefined &&
+      particle.updateNextTempAtI >= simulationI
+    ) {
+      particle.temperature = particle.nextTemperature
+      particle.updateNextTempAtI = Number.POSITIVE_INFINITY
+      particle.nextTemperature = undefined
+    }
     particle.entity.update(particle)
     particle.updateTemperature()
     particle.entity.extraUpdate?.(particle)
   }
 
   incrementSimulationI()
-  // Else, don't move.
   benchmark("update", true)
 }

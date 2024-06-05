@@ -9,8 +9,6 @@ import {
 } from "../common/utils/points"
 import { Particle, particleAtSafe } from "./Particle"
 
-const radius = 15
-
 const onMouseDown = (props: {
   pos: Pos
   draggingFrom: Pos | undefined
@@ -21,12 +19,12 @@ const onMouseDown = (props: {
     : [props.pos]
 
   points.forEach((linePos) => {
-    getCirclePoints({ ...linePos, radius }).forEach((pos) => {
+    getCirclePoints({ ...linePos, radius: data.radius }).forEach((pos) => {
       props.entity
         ? Particle.create({
             ...pos,
             entity: props.entity,
-            replace: true,
+            replace: data.replace,
           })
         : particleAtSafe(pos.x, pos.y)?.remove()
     })
@@ -53,13 +51,15 @@ export const getSandboxMouse = ({ ctx }: CtxObj) => {
 
   const drawMousePosition = () => {
     if (!mouse.pos) return
-    getCircleOutlinePoints(mouse.pos.x, mouse.pos.y, radius).forEach((pos) => {
-      if (isInBounds(pos.x, pos.y)) {
-        ctx.fillStyle = "#ff000040"
-        ctx.fillRect(pos.x, pos.y, 1, 1)
-        // mousePosToClear.push({ ...pos })
-      }
-    })
+    getCircleOutlinePoints(mouse.pos.x, mouse.pos.y, data.radius).forEach(
+      (pos) => {
+        if (isInBounds(pos.x, pos.y)) {
+          ctx.fillStyle = "#ff000040"
+          ctx.fillRect(pos.x, pos.y, 1, 1)
+          // mousePosToClear.push({ ...pos })
+        }
+      },
+    )
   }
 
   return {

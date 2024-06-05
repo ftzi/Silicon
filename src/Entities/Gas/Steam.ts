@@ -3,7 +3,7 @@ import { GasEntity } from "./GasEntity"
 
 export const Steam = new GasEntity({
   name: "Steam",
-  rgb: "#b0c0d0",
+  rgb: "#b0c0d030",
   density: 0.0006,
   initialTemperature: 100,
   heatCapacity: 2.08,

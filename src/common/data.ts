@@ -9,11 +9,15 @@ type Data = {
   right: Entity | null
   radius: number
   running: boolean
+  step: boolean
+  replace: boolean
 }
 
 export const data: Data = {
-  left: Entities.Sand,
-  right: Entities.Water,
-  radius: 10,
+  left: Entities.Iron,
+  right: Entities.Fire,
+  radius: 5,
   running: true,
+  step: false,
+  replace: false,
 }

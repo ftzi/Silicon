@@ -17,6 +17,11 @@ export const getToolbox = ({ ctx }: CtxObj) => {
     data.running = !data.running
   })
 
+  Mousetrap.bind("n", () => {
+    data.step = true
+    data.running = true
+  })
+
   let prevButton: EntityButton | undefined
   const entitiesButtons = [...Object.values(Entities)].map((entity) => {
     prevButton = new EntityButton({

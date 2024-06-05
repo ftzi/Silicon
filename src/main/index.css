@@ -6,7 +6,7 @@
 }
 
 :root {
-  font-family: 'Press Start 2P', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Uni0553', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -31,4 +31,11 @@ canvas {
   /* image-rendering: -webkit-optimize-contrast; */
   /* Safari and Chrome */
   /* image-rendering: crisp-edges; */
+}
+
+@font-face {
+  font-family: 'Uni0553';
+  src: url('/uni05_53.tff') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }

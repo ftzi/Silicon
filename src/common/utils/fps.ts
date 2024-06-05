@@ -1,5 +1,6 @@
 import { numberParticles, particleAtSafe } from "../../Sandbox/Particle"
 import { sandboxMouse } from "../../Sandbox/Sandbox"
+import { getFont } from "../consts"
 
 // const maxFps = 400
 // const targetFrameDuration = (1000 / maxFps) * 0.9
@@ -66,7 +67,7 @@ const drawFps = (ctx: Ctx) => {
 
   const getTextY = (i: number) => y + padding + textHeight * i + i * linePadding
 
-  ctx.font = `${textHeight}px 'Press Start 2P'`
+  ctx.font = getFont(textHeight)
   values.forEach((value, i) => {
     const textY = getTextY(i)
 
@@ -83,7 +84,7 @@ const drawFps = (ctx: Ctx) => {
   ctx.fillRect(x, logoY, ctx.logicWidth, 1)
   ctx.textAlign = "center"
   ctx.textBaseline = "top"
-  ctx.font = `${textHeight + 3}px 'Press Start 2P'`
+  ctx.font = getFont(textHeight + 3)
   ctx.fillText("SILICON", ctx.logicWidth / 2, logoY + 9)
 }
 

@@ -1,4 +1,5 @@
 import type { Entity } from "../Entities/Entity"
+import { getFont } from "../common/consts"
 import { data } from "../common/data"
 import { isPosInRect } from "../common/utils/points"
 
@@ -44,7 +45,7 @@ export class EntityButton {
   }
 
   draw() {
-    this.ctx.font = `${this.textHeight}px 'Press Start 2P'`
+    this.ctx.font = getFont(this.textHeight)
     this.ctx.textAlign = "left"
     this.ctx.textBaseline = "top"
 

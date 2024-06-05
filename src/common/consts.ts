@@ -13,3 +13,5 @@ export const invertedBackgroundColor = getInvertedHexColor(backgroundColor)
 export const ambientTemperature = 23
 export const maxTemp = 9999
 export const minTemp = -270
+
+export const getFont = (fontSize: number) => `${fontSize}px Uni0553 `

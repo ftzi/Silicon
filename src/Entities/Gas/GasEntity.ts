@@ -19,9 +19,6 @@ const checkRight = (particle: Particle): true | undefined => {
   }
 }
 
-export const shouldGasGoUp = (particle: Particle): boolean =>
-  Math.random() > particle.entity.density / 0.0012
-
 export class GasEntity extends Entity {
   constructor(props: OmitKey<EntityConstructorProps, "state" | "viscosity">) {
     super({ ...props, state: State.Gas })
@@ -30,8 +27,12 @@ export class GasEntity extends Entity {
   update(particle: Particle) {
     const top = particle.top
 
-    if (!top && particle.y > 0) {
-      if (shouldGasGoUp(particle)) particle.moveToAdd(0, -1)
+    if (
+      !top &&
+      particle.y > 0 &&
+      Math.random() > particle.entity.density / 0.0012
+    ) {
+      particle.moveToAdd(0, -1)
 
       return
     }
@@ -42,7 +43,8 @@ export class GasEntity extends Entity {
       top.entity.density > particle.entity.density &&
       top.swappedAt < simulationI &&
       particle.swappedAt < simulationI &&
-      Math.random() > 0.8
+      Math.random() >
+        1 - (1 + particle.entity.density) / (1 + top.entity.density)
     ) {
       particle.swap(top)
 

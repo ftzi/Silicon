@@ -5,8 +5,9 @@ export const Iron = new FixedEntity({
   name: "Iron",
   rgb: "#606060",
   density: 7.9,
-  heatCapacity: 0.45,
-  thermalConductivity: 80,
+  heatCapacity: 5,
+  thermalConductivity: 5,
+  initialTemperature: 50,
 })
 
 type ColorTemp = { temp: number; color: HexColor }
